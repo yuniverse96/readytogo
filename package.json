@@ -10,16 +10,17 @@
     "@testing-library/user-event": "^13.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router-dom": "^7.6.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build-docs": "npm run build && rm -rf docs && mv build docs",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "rm -rf docs && cp -r build docs"
+    "eject": "react-scripts eject"
+  
   },
   "eslintConfig": {
     "extends": [
