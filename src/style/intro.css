@@ -14,6 +14,6 @@
 #intro {width: 100%; height: 100%; overflow: hidden; background-color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center;}
 #intro .txt_box {display: flex; flex-direction: column; align-items: center; gap: 2px;}
 #intro .txt_box h2{ font-family: 'CWDangamAsac-Bold',sans-serif; font-size: 50px; line-height: normal; color: #72bbff; }
-#intro .txt_box p { font-family: 'Uiyeun',sans-serif; font-size: 30px; letter-spacing: -0.165px; color: #004374;}
+#intro .txt_box p { font-family: 'Uiyeun',sans-serif; font-size: 20px; letter-spacing: -0.165px; color: #004374;}
 #intro .btn_wrap {width: 30%; border-radius: 6px; overflow: hidden; margin-top: 60px;}
 #intro .btn_wrap > button {width: 100%;padding: 10px; box-sizing: border-box; text-align: center; color: #fff; background-color: #72bbff;}
