@@ -1,86 +1,80 @@
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
+import { useEffect, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
 import '../style/intro.css';
-
-const icons = [
-  process.env.PUBLIC_URL + "/images/sun.png",
-  process.env.PUBLIC_URL + "/images/cloudy.png",
-  process.env.PUBLIC_URL + "/images/snow.png",
-  process.env.PUBLIC_URL + "/images/thunder.png",
-  process.env.PUBLIC_URL + "/images/sun_cloudy.png",
-  process.env.PUBLIC_URL + "/images/rain.png"
-];
 
 function Intro() {
   const navigate = useNavigate();
-  const imgRef = useRef(null);
-  const [currentIdx, setCurrentIdx] = useState(0);
+  const logoRef = useRef(null);
+  const textWrapRef = useRef(null);
+  const buttonRef = useRef(null);
 
-  // 🔹 이미지 미리 로딩
   useEffect(() => {
-    icons.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []);
+    const lines = textWrapRef.current.querySelectorAll("p");
+    const tl = gsap.timeline();
 
-  // 🔹 애니메이션 + 이미지 전환
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!imgRef.current) return;
+    // 로고 올라오기
+    tl.fromTo(
+      logoRef.current,
+      { y: 100, autoAlpha: 0 },
+      { y: 0, autoAlpha: 1, duration: 1, ease: "power3.out" }
+    )
 
-      gsap.to(imgRef.current, {
-        duration: 0.5,
-        rotateX: 90,
-        opacity: 0,
-        ease: "power1.in",
-        onComplete: () => {
-          // 이미지 인덱스 변경
-          setCurrentIdx((prev) => (prev + 1) % icons.length);
+    // 텍스트 전체 블록 페이드인
+    .fromTo(
+      textWrapRef.current,
+      { autoAlpha: 0 },
+      { autoAlpha: 1, duration: 0.5 },
+      "+=0.2"
+    )
 
-          // 다음 프레임에 애니메이션 실행 (부드럽게 전환)
-          requestAnimationFrame(() => {
-            if (!imgRef.current) return;
-            gsap.fromTo(
-              imgRef.current,
-              { rotateX: -90, opacity: 0 },
-              {
-                duration: 0.5,
-                rotateX: 0,
-                opacity: 1,
-                ease: "power1.out"
-              }
-            );
-          });
-        }
+    // 롤업 애니메이션
+    .add(() => {
+      gsap.set(lines, { yPercent: 100, autoAlpha: 0 });
+      gsap.set(lines[0], { yPercent: 0, autoAlpha: 1 });
+      let currentIndex = 0;
+
+      const rollTl = gsap.timeline({ delay: 0.5 });
+      for (let i = 1; i < lines.length; i++) {
+        rollTl.to(lines[currentIndex], {
+          yPercent: -100,
+          autoAlpha: 0,
+          duration: 0.8,
+          ease: "power2.inOut"
+        }).fromTo(
+          lines[i],
+          { yPercent: 100, autoAlpha: 0 },
+          { yPercent: 0, autoAlpha: 1, duration: 0.8, ease: "power2.inOut" },
+          "<"
+        );
+        currentIndex = i;
+      }
+
+      rollTl.to(buttonRef.current, {
+        autoAlpha: 1,
+        duration: 0.8,
+        ease: "power2.out",
+        delay: 0.5
       });
-    }, 2000);
+    });
 
-    return () => clearInterval(interval);
   }, []);
 
   return (
     <div id="intro">
-      <div className="img_animation">
-          
-        <div className="img_wrap">
-            <img
-              ref={imgRef}
-              className="weather-icon"
-              src={icons[currentIdx]}
-              alt="weather"
-            />
+      <div className="top_wrap">
+        <div className="logo_wrap" ref={logoRef}>
+          <img src={`${process.env.PUBLIC_URL}/images/logo.png`} alt="logo" />
+        </div>
+
+        <div className="txt_ani" ref={textWrapRef}>
+          <p>더 이상 날씨 때문에<br />괴로워 하지 마세요.</p>
+          <p>바깥 날씨는 잊고<br />나만의 하루를 시작하세요.</p>
         </div>
       </div>
 
-      <div className="txt_box">
-        <h2>오늘 어디가?</h2>
-        <p>where are you going?</p>
-      </div>
-
-      <div className="btn_wrap">
-        <button onClick={() => navigate('/Home')}>시작하기</button>
+      <div className="btn_wrap" ref={buttonRef}>
+        <button onClick={() => navigate('/home')}>시작하기</button>
       </div>
     </div>
   );
