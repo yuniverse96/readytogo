@@ -5,36 +5,39 @@ import '../style/intro.css';
 
 function Intro() {
   const navigate = useNavigate();
-  const logoRef = useRef(null);
+  const topWrapRef = useRef(null);
   const textWrapRef = useRef(null);
   const buttonRef = useRef(null);
 
   useEffect(() => {
     const lines = textWrapRef.current.querySelectorAll("p");
+
+    // 초기 상태 세팅 (깜빡임 방지)
+    gsap.set(lines, { yPercent: 100, autoAlpha: 0 });
+    gsap.set(lines[0], { yPercent: 0, autoAlpha: 1 });
+
     const tl = gsap.timeline();
 
-    // 로고 올라오기
+    // 1. top_wrap 전체가 아래에서 올라오며 등장
     tl.fromTo(
-      logoRef.current,
+      topWrapRef.current,
       { y: 100, autoAlpha: 0 },
       { y: 0, autoAlpha: 1, duration: 1, ease: "power3.out" }
     )
 
-    // 텍스트 전체 블록 페이드인
+    // 2. 텍스트 블럭 페이드인
     .fromTo(
       textWrapRef.current,
       { autoAlpha: 0 },
       { autoAlpha: 1, duration: 0.5 },
-      "+=0.2"
+      "+=0.3"
     )
 
-    // 롤업 애니메이션
+    // 3. 텍스트 롤업 애니메이션 시작
     .add(() => {
-      gsap.set(lines, { yPercent: 100, autoAlpha: 0 });
-      gsap.set(lines[0], { yPercent: 0, autoAlpha: 1 });
       let currentIndex = 0;
+      const rollTl = gsap.timeline({ delay: 1 });
 
-      const rollTl = gsap.timeline({ delay: 0.5 });
       for (let i = 1; i < lines.length; i++) {
         rollTl.to(lines[currentIndex], {
           yPercent: -100,
@@ -50,20 +53,20 @@ function Intro() {
         currentIndex = i;
       }
 
+      // 4. 마지막 문장 후 버튼 등장
       rollTl.to(buttonRef.current, {
         autoAlpha: 1,
-        duration: 0.8,
+        duration: 2,
         ease: "power2.out",
-        delay: 0.5
+        delay: 1
       });
     });
-
   }, []);
 
   return (
     <div id="intro">
-      <div className="top_wrap">
-        <div className="logo_wrap" ref={logoRef}>
+      <div className="top_wrap" ref={topWrapRef}>
+        <div className="logo_wrap">
           <img src={`${process.env.PUBLIC_URL}/images/logo.png`} alt="logo" />
         </div>
 
