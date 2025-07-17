@@ -63,7 +63,10 @@ function Join() {
       alert('아이디 중복확인을 해주세요.');
       return;
     }
-
+    if (password.length < 8) {
+        alert('비밀번호는 최소 8자 이상이어야 합니다.');
+        return;
+      }
     if (password !== passwordConfirm) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
@@ -101,7 +104,7 @@ function Join() {
             name="userId"
             value={formData.userId}
             onChange={handleChange}
-            showLabel="inline"
+            showLabel="top"
             placeholder="아이디를 입력하세요"
           />
           <button type="button" onClick={checkDuplicateId} style={{ height: '30px' }}>
@@ -115,7 +118,7 @@ function Join() {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          showLabel="inline"
+          showLabel="top"
           placeholder="이메일을 입력하세요"
         />
         <AuthInput
@@ -124,9 +127,9 @@ function Join() {
           name="password"
           value={formData.password}
           onChange={handleChange}
-          showLabel="inline"
+          showLabel="top"
           autoComplete="new-password"
-          placeholder="비밀번호를 입력하세요"
+          placeholder="비밀번호는 8자리 이상 입력하세요"
         />
         <AuthInput
           label="비밀번호 확인"
@@ -134,7 +137,7 @@ function Join() {
           name="passwordConfirm"
           value={formData.passwordConfirm}
           onChange={handleChange}
-          showLabel="inline"
+          showLabel="top"
           autoComplete="new-password"
           placeholder="비밀번호를 다시 입력하세요"
         />
