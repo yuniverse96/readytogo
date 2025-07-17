@@ -2,9 +2,9 @@
 # 오늘 어디가? 
 아래 링크에서 확인가능.\
 \
-https://yuniverse96.github.io/readytogo/\
+https://yuniverse96.github.io/readytogo/
 \
-모바일 웹 날씨기반 의류 추천 사이트.\
+모바일 웹 날씨기반 의류 추천 사이트.
 
 
 # Getting Started with Create React App
