@@ -1,5 +1,8 @@
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { auth } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+
 import Join from './Join';
 import AuthInput from '../component/AuthInput';
 import '../style/login.css';
@@ -25,10 +28,27 @@ const handleChange = (e) => {
   }));
 };
 
-const loginSubmit = (e) => {
-  e.preventDefault();
-  console.log(formData);
-}
+  // 로그인 제출 핸들러
+  const loginSubmit = async (e) => {
+    e.preventDefault();
+    const { userMail, userPass } = formData;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, userMail, userPass);
+      const user = userCredential.user;
+      console.log("로그인 성공!", user);
+
+      // 로그인 성공 시 원하는 경로로 이동
+      navigate('/home');
+    } catch (error) {
+      console.error("로그인 실패:", error.code, error.message);
+      alert("아이디와 비밀번호를 확인해 주세요.");
+    }
+  };
+
+
+
+
 
   return (
     < div id='login'>
@@ -37,8 +57,8 @@ const loginSubmit = (e) => {
           <div className='login_form'>
             <form onSubmit={loginSubmit}>
               <AuthInput
-              label="이메일"
-              type="email"
+              label="아이디"
+              type="text"
               name="userMail"
               value={formData.userMail}
               onChange={handleChange}
