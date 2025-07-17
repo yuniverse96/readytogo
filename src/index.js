@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Main from './Main';
-import { BrowserRouter } from 'react-router-dom';
-
+import { HashRouter } from 'react-router-dom';
+import { AuthProvider } from './AuthContext'; // 경로 맞게 조정
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter basename='/readytogo'>
-     <Main />
-  </BrowserRouter>
+  <AuthProvider>
+    <HashRouter>
+      <Main />
+    </HashRouter>
+  </AuthProvider>
 );
-
-
