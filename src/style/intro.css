@@ -1,15 +1,4 @@
-@font-face {
-    font-family: 'CWDangamAsac-Bold';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/CWDangamAsac-Bold.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Uiyeun';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105@1.1/Uiyeun.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
+
 
 #intro {width: 100%; height: 100%; overflow: hidden; background-color: #00BFF9; display: flex; flex-direction: column; justify-content: center; align-items: center;}
 #intro .top_wrap {text-align: center; transform: translateY(0); opacity: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;}

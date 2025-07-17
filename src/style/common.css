@@ -1,2 +1,21 @@
 *{margin: 0; padding: 0; box-sizing: border-box;}
-#wrap {width: 100vw; max-width: 720px; height: 100vh; margin: 0 auto; border: 1px solid #efefef; }
+
+#wrap {width: 100vw; max-width: 720px; height: 100vh; margin: 0 auto; }
+
+/*인풋 공동 레이아웃*/
+.input_wrap {width: 100%; height: 56px; padding: 19px 16px; border: 1px solid #d8dadc; position: relative; border-radius: 10px; transition: all linear 0.2s; }
+.input_wrap > input {width: 100%; height: 100%; font-size: 14px;}
+.input_wrap label {position: absolute; top: 50%; left: 16px; transform: translate(0,-50%); font-size: 14px; transition: all linear 0.2s; }
+
+.input_wrap:focus-within {border: 1px solid #00bff9; }
+.input_wrap:focus-within label,
+.input_wrap.has_v label {top: 15px;font-size: 11px;}
+
+
+
+.btn_submit {width: 100%; height: 56px; border-radius: 10px; overflow: hidden; text-align: center;}
+
+
+
+
+
