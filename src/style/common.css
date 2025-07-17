@@ -3,7 +3,7 @@
 #wrap {width: 100vw; max-width: 500px; height: 100vh; margin: 0 auto; }
 
 /*인풋 공동 레이아웃*/
-.input_wrap {width: 100%; height: 56px; padding: 0px 16px; border: 1px solid #d8dadc; position: relative; border-radius: 10px; transition: all linear 0.2s; }
+.input_wrap {width: 100%; height: 56px; padding: 0px 16px; border: 1px solid #d8dadc; background-color: #fff; position: relative; border-radius: 10px; transition: all linear 0.2s; }
 .input_wrap > input {width: 100%; height: 100%; font-size: 14px;}
 .input_wrap label {position: absolute; top: 50%; left: 16px; transform: translate(0,-50%); font-size: 14px; transition: all linear 0.2s; }
 .input_wrap.has_v input,

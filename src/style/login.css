@@ -1,8 +1,11 @@
-#login {width: 100%; height: 100%; padding: 20px; }
+#login {width: 100%; height: 100%; padding: 0px 20px; background-color: #f7f7f7; }
 #login .login_form form {width: 100%; display: flex; flex-direction: column; gap: 15px;}
-
-
-#btn_submit {width: 100%; height: 56px; border-radius: 10px; background-color: #00bff0; overflow: hidden;}
+#login .top_logo {width: 170px; margin: 0 auto 13px; padding-top: 19.68vh;}
+#login .top_logo .img_wrap {width: 100%; }
+#login .top_logo .img_wrap > img {width: 100%; height: auto; }
+#btn_submit {width: 100%; height: 56px;  margin-top: 10px; border-radius: 10px; background-color: #00bff0; overflow: hidden;}
 #btn_submit > button {width: 100%; height: 100%; color: #fff; font-weight: 600;} 
-#btn_join {background-color: #191919; border-radius: 15px; position: fixed; left: 50%; bottom: 90px; transform: translate(-50%,0);  } 
-#btn_join > button{ width: 120px; height: 50px; color: #fff; text-align: center; font-size: 14px; font-weight: 600; letter-spacing: -0.6px; line-height: 21px;}
+
+.bottom_btn {display: flex; flex-direction: column; align-items: center; position: fixed; left: 50%; bottom: 100px; transform: translate(-50%,0); }
+#btn_join {width: 120px; height: 50px; background-color: #191919; border-radius: 15px;  } 
+#btn_join > button{width: 100%; height: 100%; color: #fff; text-align: center; font-size: 14px; font-weight: 600; letter-spacing: -0.6px; line-height: 21px;}
