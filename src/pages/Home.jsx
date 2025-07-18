@@ -20,11 +20,7 @@ function Home() {
 
   return (
     <div>
-      <h2>🏠 Home 페이지</h2>
-
-      <button onClick={handleButtonClick}>
-        {user ? '로그아웃' : '로그인'}
-      </button>
+    
 
       <Routes>
         <Route path="/" element={<HomeMain />} />
