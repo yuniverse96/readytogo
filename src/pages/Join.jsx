@@ -193,7 +193,7 @@ function Join() {
       await setDoc(userDocRef, { email });
 
       alert('회원가입 성공! 로그인 페이지로 이동합니다.');
-      navigate('/readytogo/login');
+      navigate('/login');
     } catch (error) {
       console.error('회원가입 실패:', error);
       if (error.code === 'auth/email-already-in-use') {
