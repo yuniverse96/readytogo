@@ -46,7 +46,7 @@ function Intro() {
     // 3. 텍스트 롤업 애니메이션 시작
     .add(() => {
       let currentIndex = 0;
-      const rollTl = gsap.timeline({ delay: 1 });
+      const rollTl = gsap.timeline({ delay: 0.3 });
 
       for (let i = 1; i < lines.length; i++) {
         rollTl.to(lines[currentIndex], {
@@ -66,9 +66,9 @@ function Intro() {
       // 4. 마지막 문장 후 버튼 등장
       rollTl.to(buttonRef.current, {
         autoAlpha: 1,
-        duration: 2,
+        duration: 1,
         ease: "power2.out",
-        delay: 1
+        delay: 0.3
       });
     });
   }, []);
