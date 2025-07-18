@@ -19,8 +19,6 @@
 #btn_join {width: 120px; height: 50px; background-color: #00242e; border-radius: 15px;  } 
 #btn_join > button{width: 100%; height: 100%; color: #fff; text-align: center; font-size: 14px; font-weight: 600; letter-spacing: -0.6px; line-height: 21px;}
 
-
-
 #join form {width: 100%; display: flex; flex-direction: column; gap: 15px;}
 #join .top_img {width: 170px; margin: 0 auto 13px; padding-top: 15vh;}
 #join .top_img .img_wrap {width: 100%; }

@@ -10,6 +10,19 @@ function Intro() {
   const buttonRef = useRef(null);
 
   useEffect(() => {
+
+    //오늘 날짜 비교해서 intro 건너뛰기
+    const today = new Date().toISOString().split('T')[0];
+    const skipDate = localStorage.getItem('introSkipDate');
+
+    if (skipDate === today) {
+      navigate('/home');
+      return;
+    }
+
+
+
+
     const lines = textWrapRef.current.querySelectorAll("p");
 
     // 초기 상태 세팅 (깜빡임 방지)
@@ -63,6 +76,12 @@ function Intro() {
     });
   }, []);
 
+  const handleStart = () => {
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem('introSkipDate', today);
+    navigate('/home');
+  };
+
   return (
     <div id="intro">
       <div className="top_wrap" ref={topWrapRef}>
@@ -77,8 +96,9 @@ function Intro() {
       </div>
 
       <div className="btn_wrap" ref={buttonRef}>
-        <button onClick={() => navigate('/home')}>시작하기</button>
+        <button onClick={handleStart}>시작하기</button>
       </div>
+
     </div>
   );
 }
