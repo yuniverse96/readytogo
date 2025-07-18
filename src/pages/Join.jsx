@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -17,18 +17,94 @@ function Join() {
 
   const [isIdChecked, setIsIdChecked] = useState(false);
 
+  const [formError, setFormError] = useState({
+    userId: { msg: '', type: '' },
+    email: { msg: '', type: '' },
+    password: { msg: '', type: '' },
+    passwordConfirm: { msg: '', type: '' }
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
+    setFormError(prev => ({
+      ...prev,
+      [name]: { msg: '', type: '' }
+    }));
+
     if (name === 'userId') setIsIdChecked(false);
   };
 
-  // 아이디 중복확인
+  // 비밀번호 디바운스 검사
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const password = formData.password;
+
+      if (!password) {
+        setFormError(prev => ({
+          ...prev,
+          password: { msg: '', type: '' }
+        }));
+        return;
+      }
+
+      const isValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/.test(password);
+
+      setFormError(prev => ({
+        ...prev,
+        password: {
+          msg: isValid
+            ? '사용 가능한 비밀번호입니다.'
+            : '영문 숫자를 포함한 4자~12자여야 합니다.',
+          type: isValid ? 'success' : 'error'
+        }
+      }));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.password]);
+
+  // 비밀번호 확인 디바운스 검사
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!formData.passwordConfirm) {
+        setFormError(prev => ({
+          ...prev,
+          passwordConfirm: { msg: '', type: '' }
+        }));
+        return;
+      }
+
+      const isMatch = formData.password === formData.passwordConfirm;
+
+      setFormError(prev => ({
+        ...prev,
+        passwordConfirm: {
+          msg: isMatch ? '비밀번호가 일치합니다.' : '비밀번호가 일치하지 않습니다.',
+          type: isMatch ? 'success' : 'error'
+        }
+      }));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.passwordConfirm, formData.password]);
+
+  //비밀번호 확인
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   const checkDuplicateId = async () => {
     const userId = formData.userId.trim();
+
     if (!userId) {
-      alert('아이디를 입력해주세요.');
+      setFormError(prev => ({
+        ...prev,
+        userId: { msg: '아이디를 입력해주세요.', type: 'error' }
+      }));
       return;
     }
 
@@ -37,15 +113,23 @@ function Join() {
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
-        alert('이미 사용 중인 아이디입니다.');
+        setFormError(prev => ({
+          ...prev,
+          userId: { msg: '이미 사용 중인 아이디입니다.', type: 'error' }
+        }));
         setIsIdChecked(false);
       } else {
-        alert('사용 가능한 아이디입니다.');
+        setFormError(prev => ({
+          ...prev,
+          userId: { msg: '사용 가능한 아이디입니다.', type: 'success' }
+        }));
         setIsIdChecked(true);
       }
     } catch (error) {
-      console.error('중복 확인 실패:', error);
-      alert('중복 확인 중 오류가 발생했습니다.');
+      setFormError(prev => ({
+        ...prev,
+        userId: { msg: '중복 확인 중 오류가 발생했습니다.', type: 'error' }
+      }));
       setIsIdChecked(false);
     }
   };
@@ -54,29 +138,58 @@ function Join() {
     e.preventDefault();
     const { userId, email, password, passwordConfirm } = formData;
 
-    if (!userId || !email || !password || !passwordConfirm) {
-      alert('모든 항목을 입력해주세요.');
-      return;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{4,12}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const errors = {
+      userId: { msg: '', type: '' },
+      email: { msg: '', type: '' },
+      password: { msg: '', type: '' },
+      passwordConfirm: { msg: '', type: '' }
+    };
+
+    let hasError = false;
+
+    if (!userId) {
+      errors.userId = { msg: '아이디를 입력해주세요.', type: 'error' };
+      hasError = true;
+    } else if (!isIdChecked) {
+      errors.userId = { msg: '아이디 중복확인을 해주세요.', type: 'error' };
+      hasError = true;
     }
 
-    if (!isIdChecked) {
-      alert('아이디 중복확인을 해주세요.');
-      return;
+    if (!email) {
+      errors.email = { msg: '이메일을 입력해주세요.', type: 'error' };
+      hasError = true;
+    } else if (!emailRegex.test(email)) {
+      errors.email = { msg: '올바른 이메일 형식을 입력하세요.', type: 'error' };
+      hasError = true;
     }
-    if (password.length < 8) {
-        alert('비밀번호는 최소 8자 이상이어야 합니다.');
-        return;
-      }
-    if (password !== passwordConfirm) {
-      alert('비밀번호가 일치하지 않습니다.');
+
+    if (!password) {
+      errors.password = { msg: '비밀번호를 입력해주세요.', type: 'error' };
+      hasError = true;
+    } else if (!passwordRegex.test(password)) {
+      errors.password = { msg: '영문 숫자를 포함한 4자~12자여야 합니다.', type: 'error' };
+      hasError = true;
+    }
+
+    if (!passwordConfirm) {
+      errors.passwordConfirm = { msg: '비밀번호 확인을 입력해주세요.', type: 'error' };
+      hasError = true;
+    } else if (password !== passwordConfirm) {
+      errors.passwordConfirm = { msg: '비밀번호가 일치하지 않습니다.', type: 'error' };
+      hasError = true;
+    }
+
+    if (hasError) {
+      setFormError(errors);
       return;
     }
 
     try {
-      // 회원가입 시도
       await createUserWithEmailAndPassword(auth, email, password);
 
-      // Firestore에 아이디-이메일 매핑 저장
       const userDocRef = doc(db, 'userIds', userId);
       await setDoc(userDocRef, { email });
 
@@ -84,9 +197,11 @@ function Join() {
       navigate('/readytogo/login');
     } catch (error) {
       console.error('회원가입 실패:', error);
-
       if (error.code === 'auth/email-already-in-use') {
-        alert('이미 가입된 이메일입니다.');
+        setFormError(prev => ({
+          ...prev,
+          email: { msg: '이미 가입된 이메일입니다.', type: 'error' }
+        }));
       } else {
         alert('회원가입 중 오류가 발생했습니다.');
       }
@@ -95,10 +210,13 @@ function Join() {
 
   return (
     <div id="join">
-      <h2>회원가입</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <AuthInput
+        <div className='top_img'>
+            <div className='img_wrap'>
+            <img src={`${process.env.PUBLIC_URL}/images/join_top.png`} alt="logo" />
+            </div>
+        </div>
+        <form onSubmit={handleSubmit}>
+            <AuthInput
             label="아이디"
             type="text"
             name="userId"
@@ -106,46 +224,55 @@ function Join() {
             onChange={handleChange}
             showLabel="top"
             placeholder="아이디를 입력하세요"
-          />
-          <button type="button" onClick={checkDuplicateId} style={{ height: '30px' }}>
-            중복확인
-          </button>
-        </div>
-
-        <AuthInput
-          label="이메일"
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          showLabel="top"
-          placeholder="이메일을 입력하세요"
-        />
-        <AuthInput
-          label="비밀번호"
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          showLabel="top"
-          autoComplete="new-password"
-          placeholder="비밀번호는 8자리 이상 입력하세요"
-        />
-        <AuthInput
-          label="비밀번호 확인"
-          type="password"
-          name="passwordConfirm"
-          value={formData.passwordConfirm}
-          onChange={handleChange}
-          showLabel="top"
-          autoComplete="new-password"
-          placeholder="비밀번호를 다시 입력하세요"
-        />
-
-        <div id="btn_submit">
-          <button type="submit" className="btn_submit">가입하기</button>
-        </div>
-      </form>
+            showBtn="check"
+            onButtonClick={checkDuplicateId}
+            btnText="중복확인"
+            msg={formError.userId.msg}
+            msgType={formError.userId.type}
+            />
+            <AuthInput
+            label="이메일"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            showLabel="top"
+            placeholder="이메일을 입력하세요"
+            msg={formError.email.msg}
+            msgType={formError.email.type}
+            />
+            <AuthInput
+            label="비밀번호"
+            type={showPassword ? 'text':'password'}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            showLabel="top"
+            placeholder="비밀번호는 8자리 이상 입력하세요"
+            showBtn={`show${showPassword ? ' on' : ''}`}
+            onButtonClick={togglePassword}
+            btnText=""
+            msg={formError.password.msg}
+            msgType={formError.password.type}
+            />
+            <AuthInput
+            label="비밀번호 확인"
+            type={showPassword ? 'text':'password'}
+            name="passwordConfirm"
+            value={formData.passwordConfirm}
+            onChange={handleChange}
+            showLabel="top"
+            placeholder="비밀번호를 다시 입력하세요"
+            showBtn="show"
+            onButtonClick={togglePassword}
+            btnText=""
+            msg={formError.passwordConfirm.msg}
+            msgType={formError.passwordConfirm.type}
+            />
+            <div id="btn_submit">
+            <button type="submit" className="btn_submit">회원가입</button>
+            </div>
+        </form>
     </div>
   );
 }

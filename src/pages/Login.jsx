@@ -67,9 +67,9 @@ function Login() {
   };
 
   return (
-    <div id='login'>
+    <>
       {isRootLogin && (
-        <>
+        <div id='login'>
           <div className='top_logo'>
             <div className='img_wrap'>
               <img src={`${process.env.PUBLIC_URL}/images/login.png`} alt="logo" />
@@ -116,13 +116,13 @@ function Login() {
               <button onClick={() => navigate('join')}>회원가입</button>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       <Routes>
         <Route path="join" element={<Join />} />
       </Routes>
-    </div>
+    </>
   );
 }
 
