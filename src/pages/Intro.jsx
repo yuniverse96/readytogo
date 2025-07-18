@@ -20,9 +20,6 @@ function Intro() {
       return;
     }
 
-
-
-
     const lines = textWrapRef.current.querySelectorAll("p");
 
     // 초기 상태 세팅 (깜빡임 방지)

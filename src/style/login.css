@@ -23,3 +23,15 @@
 #join .top_img {width: 170px; margin: 0 auto 13px; padding-top: 15vh;}
 #join .top_img .img_wrap {width: 100%; }
 #join .top_img .img_wrap > img {width: 100%; height: auto; }
+
+#welcome {width: 100%; height: 100%; padding: 0px 90px; background-color: #00bff0; display:  flex; flex-direction: column; align-items: center; justify-content: center; }
+#welcome .top_img {width: 100%; overflow: hidden;}
+#welcome .top_img .img_wrap {width: 100%;}
+#welcome .top_img .img_wrap > img {width: 100%; height: auto;}
+#welcome .btn_all {width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; opacity: 0; margin-top: 57px; } 
+#welcome .btn_all .btn_wrap {border-radius: 15px;} 
+#welcome .btn_all .btn_wrap  > button{ width: 120px; height: 50px; text-align: center; font-size: 14px; font-weight: 600; letter-spacing: -0.6px; line-height: 21px;}
+#welcome .btn_all .home {background-color: #00242e; color: #fff;}
+#welcome .btn_all .recommend {background-color: #fff; color: #00bff0;}
+
+
