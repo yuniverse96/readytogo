@@ -65,7 +65,6 @@ function Recommend() {
   
 
   const handleCoordinateSelect = (lat, lng) => {
-    console.log('좌표 선택됨:', lat, lng);
     setFormData((prev) => ({
       ...prev,
       coordinates: { lat, lng },
@@ -110,6 +109,9 @@ function Recommend() {
       console.error('제출 실패:', error);
       alert('제출 실패했습니다. 다시 시도해주세요.');
     }
+    console.log('docId:', docId);
+    console.log('formData:', formData);
+
   };
 
   return (
