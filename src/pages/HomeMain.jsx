@@ -5,6 +5,7 @@ import { auth } from '../firebase';
 import { AuthContext } from '../AuthContext';
 import useUserId from '../hooks/useUserId';
 
+
 function HomeMain() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(AuthContext);
@@ -33,6 +34,9 @@ function HomeMain() {
       <button onClick={handleButtonClick}>
         {user ? '로그아웃' : '로그인'}
       </button>
+    <br/>
+    <br/>
+      {user &&  <button  type="button" onClick={() => navigate('/recommend')}>추천받기</button> }
     </div>
   );
 }

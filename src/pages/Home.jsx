@@ -24,6 +24,7 @@ function Home() {
 
       <Routes>
         <Route path="/" element={<HomeMain />} />
+
         <Route path="login/*" element={<Login />} />
       </Routes>
     </div>
