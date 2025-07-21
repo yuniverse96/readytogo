@@ -38,6 +38,8 @@ function Recommend() {
     coordinates: { lat: null, lng: null },
   });
 
+
+  const [isLastSlide, setIsLastSlide] = useState(false);
   const handleSwiper = (where) => {
     if (swiperRef.current && where === 'next') {
       swiperRef.current.slideNext();
@@ -131,6 +133,7 @@ function Recommend() {
       <form onSubmit={handleSubmit}>
         <Swiper
           onSwiper={(swiper) => (swiperRef.current = swiper)}
+          onSlideChange={(swiper) => setIsLastSlide(swiper.isEnd)}
           pagination={{ type: 'progressbar' }}
           effect={'fade'}
           modules={[Pagination, EffectFade]}
@@ -463,15 +466,16 @@ function Recommend() {
             </div>
           </SwiperSlide>
           <SwiperSlide>
-          <button type="submit">최종 제출</button>
             <KakaoMapSearch onSelectCoordinate={handleCoordinateSelect} />
-            
           </SwiperSlide>
         
           <div className='next_btn'>
-              <button type="button" onClick={() => handleSwiper('next')}>
-                  다음으로
-              </button>
+            {isLastSlide ?
+              <button type="submit">추천받기</button>
+              :
+                <button type="button" onClick={() => handleSwiper('next')}>다음으로</button>
+          }
+            
           </div>
         </Swiper>
       </form>
