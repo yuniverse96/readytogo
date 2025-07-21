@@ -1,0 +1,50 @@
+#recommend {width: 100%; height: 100vh; padding: 40px 20px 120px; overflow: hidden; background-color: #f7f7f7;}
+#recommend .top_nav {width: 100%; height: 40px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0;}
+#recommend .top_nav .prev_btn {width: 17px; height: 17px; overflow: hidden;}
+#recommend .top_nav .prev_btn > button {width: 100%; height: 100%; text-indent: 9999px; background: url(../../public/images/prev_btn.png) no-repeat center center / cover;}
+#recommend .top_nav .go_home > button {font-size: 16px; line-height: normal; color: #747474;}
+#recommend form {width: 100%; height: 100%;}
+#rec_swiper {width: 100%; height: 100%; margin-top: 13px; background-color: #f7f7f7;}
+#rec_swiper .swiper-slide {width: 100%; height: 100%; background-color: #f7f7f7;}
+#rec_swiper .form_select {width: 100%; height: 100%; padding-bottom: 50px; overflow: hidden auto;}
+#rec_swiper .form_select .top_title {width: 100%; padding: 35px 0; text-align: center; font-weight: bold; color: #00242e; font-size: 20px; line-height: normal;}
+#rec_swiper .form_select h4 {color: #000; font-size: 14px; line-height: normal; margin-bottom: 14px;}
+#rec_swiper .form_select input[type='radio'],
+#rec_swiper .form_select input[type='checkbox']  {display: none;}
+#rec_swiper .form_select ul {margin-bottom: 20px; width: 100%; display: grid;}
+#rec_swiper .form_select  li{ background-color: #fff; border-radius: 10px; overflow: hidden;}
+
+/*성별 나이*/
+#rec_swiper .form_select .gender,
+#rec_swiper .form_select .age,
+#rec_swiper .form_select .top_wear,
+#rec_swiper .form_select .top_inner,
+#rec_swiper .form_select .bottom_wear,
+#rec_swiper .form_select .bottom_inner,
+#rec_swiper .form_select .accessory  { grid-template-columns: repeat(2, 1fr); gap:14px 12px;}
+#rec_swiper .form_select .gender li label,
+#rec_swiper .form_select .age li label,
+#rec_swiper .form_select .top_wear li label,
+#rec_swiper .form_select .top_inner li label,
+#rec_swiper .form_select .bottom_wear li label,
+#rec_swiper .form_select .bottom_inner li label,
+#rec_swiper .form_select .accessory li label{display: flex; padding: 18px 16px; width: 100%; height: 100%; color: #bcbcbc; font-size: 16px; line-height: normal;}
+#rec_swiper .form_select li:has(input:checked) {background-color: #E1F8FF; outline: 1px solid #00bff9; outline-offset: -2px;}
+#rec_swiper .form_select input:checked + label { color: #00bff9;}
+/* #rec_swiper .form_select input:checked + label::after {content: ""; display: block; width: ;} */
+
+/*민감도 */
+#rec_swiper .form_select .constitution {grid-template-columns: repeat(1, 1fr); gap:14px;}
+#rec_swiper .form_select .constitution label{display: flex; padding: 25px 16px; width: 100%; height: 100%; color: #bcbcbc; font-size: 16px; line-height: normal;}
+
+/*계절 */
+#rec_swiper .form_select .season {grid-template-columns: repeat(4, 1fr); gap:9px;}
+#rec_swiper .form_select .season label{display: flex; align-items: center; justify-content: center; padding: 18px 16px; width: 100%; height: 100%; color: #bcbcbc; font-size: 16px; line-height: normal; text-align: center;}
+
+
+
+
+
+
+#rec_swiper .next_btn {width: 100%;  padding: 0 20px; position: fixed; bottom: 60px; left: 0; z-index: 100;}
+#rec_swiper .next_btn > button {width: 100%; padding: 18px 0; background-color: #00bff9; color: #fff; border-radius: 10px; text-align: center; font-size: 16px; font-weight: 600; }

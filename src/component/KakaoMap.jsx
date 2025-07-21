@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import AuthInput from './AuthInput';
 
-function KakaoMapSearch() {
+function KakaoMapSearch({onSelectCoordinate}) {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [address, setAddress] = useState('');
@@ -49,6 +49,11 @@ function KakaoMapSearch() {
     });
 
     setCoords({ lat, lng });
+
+    // 부모에게 좌표 전달
+    if (onSelectCoordinate) {
+      onSelectCoordinate(lat, lng);
+    }
   };
 
   return (
