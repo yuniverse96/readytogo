@@ -87,7 +87,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
       <button onClick={handleSearch}>검색</button> */}
 
       {/* 지도 표시 */}
-      <div ref={mapRef} style={{ width: '100%', height: '400px', marginTop: '10px' }} />
+      <div ref={mapRef} className="map_area" />
 
       {/* 검색 결과 리스트 */}
       {searchResults.length > 0 && (
@@ -105,14 +105,6 @@ function KakaoMapSearch({onSelectCoordinate}) {
         </ul>
       )}
 
-      {/* 좌표 표시 */}
-      {coords && (
-        <div style={{ marginTop: '10px' }}>
-          <strong>선택된 좌표:</strong> <br />
-          위도: {coords.lat} <br />
-          경도: {coords.lng}
-        </div>
-      )}
     </div>
   );
 }

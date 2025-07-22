@@ -16,7 +16,8 @@ function Recommend() {
     const swiperRef = useRef(null);
     const { user } = useContext(AuthContext);
     const [isPlaceSelected, setIsPlaceSelected] = useState(false);
-
+    const inputRef = useRef(null);
+    const spanRef = useRef(null);
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isNextEnabled, setIsNextEnabled] = useState(false);
@@ -155,6 +156,14 @@ function Recommend() {
 
   };
 
+  //온도 저장 인풋 길이 수정
+  useEffect(() => {
+    if (inputRef.current && spanRef.current) {
+      const width = spanRef.current.offsetWidth;
+      inputRef.current.style.width = `${width}px`; 
+    }
+  }, [formData.temperature]);
+  
   return (
     <div id="recommend">
       <div className="top_nav">
@@ -385,11 +394,35 @@ function Recommend() {
                 </ul>
 
                 <div className='temp'>
-                    <div className='input_wrap'>
-                        <input 
+                    <div className={formData.temperature ? 'temp_input hsv' : 'temp_input'}>
+                    <input 
                         type='text'
-                        name='temperature' id='temperature' 
-                        onChange={(e) => handleChange('temperature', e.target.value)} />
+                        inputMode="numeric"
+                        name='temperature' 
+                        id='temperature'
+                        ref={inputRef}
+                        value={formData.temperature}
+                        placeholder='0'
+                       
+                        onChange={(e) => {
+                          let value = e.target.value;
+                      
+                          if (/^-?\d{0,3}$/.test(value)) {
+                            if (value === '' || value === '-') {
+                              handleChange('temperature', value);
+                              return;
+                            }
+                      
+                            const num = parseInt(value, 10);
+                            if (num >= -99 && num <= 99) {
+                              handleChange('temperature', value);
+                            }
+                          }
+                        }}
+                      />
+                       <span ref={spanRef} className="input_mirror">
+                          {formData.temperature || '0'}
+                        </span>
                         <p>℃</p>
                     </div>
                    

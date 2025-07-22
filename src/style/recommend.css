@@ -12,7 +12,7 @@
 #rec_swiper .form_select input[type='radio'],
 #rec_swiper .form_select input[type='checkbox']  {display: none;}
 #rec_swiper .form_select ul {margin-bottom: 20px; width: 100%; display: grid;}
-#rec_swiper .form_select  li{ background-color: #fff; border-radius: 10px; overflow: hidden;}
+#rec_swiper .form_select ul li{ background-color: #fff; border-radius: 10px; overflow: hidden;}
 
 /*성별 나이*/
 #rec_swiper .form_select .gender,
@@ -30,6 +30,8 @@
 #rec_swiper .form_select .bottom_inner li label,
 #rec_swiper .form_select .accessory li label{display: flex; padding: 18px 16px; width: 100%; height: 100%; color: #bcbcbc; font-size: 16px; line-height: normal;}
 #rec_swiper .form_select li:has(input:checked) {background-color: #E1F8FF; outline: 1px solid #00bff9; outline-offset: -2px;}
+#rec_swiper .form_select input:checked + label::after {content: ""; margin-left: auto; display: block; width: 19px; height: 19px;  background: url(../../public/images/select.png) no-repeat center center / cover;}
+
 #rec_swiper .form_select input:checked + label { color: #00bff9;}
 /* #rec_swiper .form_select input:checked + label::after {content: ""; display: block; width: ;} */
 
@@ -40,9 +42,17 @@
 /*계절 */
 #rec_swiper .form_select .season {grid-template-columns: repeat(4, 1fr); gap:9px;}
 #rec_swiper .form_select .season label{display: flex; align-items: center; justify-content: center; padding: 18px 16px; width: 100%; height: 100%; color: #bcbcbc; font-size: 16px; line-height: normal; text-align: center;}
+#rec_swiper .form_select .season input:checked + label::after {display: none;}
+/*온도*/
 
+#rec_swiper .form_select .temp .temp_input {border-bottom: 1px solid #bcbcbc; display: flex; align-items: center; gap: 7px; position: relative; padding: 10px 12px 10px 15px;}
+#rec_swiper .form_select .temp #temperature { min-width: 2px; box-sizing: content-box; font-size: 20px; font-weight: 500; color: #00bff9;}
+#rec_swiper .form_select .temp .input_mirror {position: absolute;visibility: hidden;white-space: pre;font-family: inherit; font-size: 20px; font-weight: 500;}
+#rec_swiper .form_select .temp p {font-size: 20px; font-weight: 500; color: #bcbcbc;}
+#rec_swiper .form_select .temp .temp_input.hsv::after {content: ""; margin-left: auto; display: block; width: 19px; height: 19px;  background: url(../../public/images/select.png) no-repeat center center / cover;}
 
-.map_lists {position: absolute; width: 100%; height: 20vh; overflow: hidden auto; top: 100px; z-index: 100; background-color: #fff;}
+.map_area {width: 100vw; height: 100vh;}
+.map_lists {position: absolute; width: 100%; height: 20vh; overflow: hidden auto; top: 62px; z-index: 100; background-color: #fff;}
 
 #recommend .next_btn {width: 100%; max-width: 500px; padding: 0 20px; position: fixed; bottom: 60px; left: 50%; transform: translate(-50%,0); z-index: 100;}
 #recommend .next_btn > button {width: 100%; padding: 18px 0; background-color: #00bff9; color: #fff; border-radius: 10px; text-align: center; font-size: 16px; font-weight: 600; transition: all linear 0.2s; }
