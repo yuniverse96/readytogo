@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KakaoMapSearch from '../component/KakaoMap';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -15,7 +15,14 @@ function Recommend() {
     const navigate = useNavigate();
     const swiperRef = useRef(null);
     const { user } = useContext(AuthContext);
+    const [isPlaceSelected, setIsPlaceSelected] = useState(false);
 
+
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isNextEnabled, setIsNextEnabled] = useState(false);
+    
+ 
+  
     const topWearOptions = ['긴팔티', '반팔티','후드티', '민소매', '니트', '셔츠', '얇은 아우터','두꺼운 아우터'];
     const topInnerOptions = ['발열 이너웨어', '런닝/나시', '레이어드 반팔티', '레이어드 긴팔티'];
 
@@ -37,6 +44,36 @@ function Recommend() {
     meetingPlace: '',
     coordinates: { lat: null, lng: null },
   });
+
+  const validateSlide = (slideIndex, data) => {
+    switch (slideIndex) {
+      case 0:
+        return data.gender !== '' && data.age !== '';
+      case 1:
+        return data.constitution !== '';
+      case 2:
+        return data.season !== '' && data.temperature.trim() !== '';
+      case 3:
+        return data.topWear.length > 0 || data.topInner.length > 0;
+      case 4:
+        return data.bottomWear.length > 0 || data.bottomInner.length > 0;
+      case 5:
+        return true;
+      default:
+        return false;
+    }
+  };
+  
+  
+  const onSlideChangeHandler = (swiper, data) => {
+    const idx = swiper.activeIndex;
+    setCurrentSlide(idx);
+    setIsNextEnabled(validateSlide(idx, data));
+  };
+
+  useEffect(() => {
+    setIsNextEnabled(validateSlide(currentSlide, formData));
+  }, [formData, currentSlide]);
 
 
   const [isLastSlide, setIsLastSlide] = useState(false);
@@ -66,11 +103,13 @@ function Recommend() {
   };
   
 
-  const handleCoordinateSelect = (lat, lng) => {
+  const handleCoordinateSelect = (lat, lng, placeName, selected) => {
     setFormData((prev) => ({
       ...prev,
       coordinates: { lat, lng },
+      meetingPlace: placeName,
     }));
+    setIsPlaceSelected(selected);
   };
 
   const handleSubmit = async (e) => {
@@ -130,10 +169,13 @@ function Recommend() {
         </div>
 
       </div>
-      <form onSubmit={handleSubmit}>
+      <form id="recommendForm" onSubmit={handleSubmit}>
         <Swiper
           onSwiper={(swiper) => (swiperRef.current = swiper)}
-          onSlideChange={(swiper) => setIsLastSlide(swiper.isEnd)}
+          onSlideChange={(swiper) => {
+            setIsLastSlide(swiper.isEnd);
+            onSlideChangeHandler(swiper, formData);
+          }}        
           pagination={{ type: 'progressbar' }}
           effect={'fade'}
           modules={[Pagination, EffectFade]}
@@ -469,15 +511,16 @@ function Recommend() {
             <KakaoMapSearch onSelectCoordinate={handleCoordinateSelect} />
           </SwiperSlide>
         
-          <div className='next_btn'>
-            {isLastSlide ?
-              <button type="submit">추천받기</button>
-              :
-                <button type="button" onClick={() => handleSwiper('next')}>다음으로</button>
-          }
-            
-          </div>
+         
         </Swiper>
+       
+          <div className='next_btn'>
+            {isLastSlide ? (
+              <button type="submit" form="recommendForm" disabled={!isPlaceSelected}>추천받기</button>
+            ) : (
+              <button type="button" onClick={() => handleSwiper('next')} disabled={!isNextEnabled}>다음으로</button>
+            )}
+          </div>
       </form>
     </div>
   );

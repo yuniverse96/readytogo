@@ -1,5 +1,5 @@
 #recommend {width: 100%; height: 100vh; padding: 40px 20px 120px; overflow: hidden; background-color: #f7f7f7;}
-#recommend .top_nav {width: 100%; height: 40px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0;}
+#recommend .top_nav {width: 100%; max-width: 500px; height: 40px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 50%; transform: translate(-50%,0);}
 #recommend .top_nav .prev_btn {width: 17px; height: 17px; overflow: hidden;}
 #recommend .top_nav .prev_btn > button {width: 100%; height: 100%; text-indent: 9999px; background: url(../../public/images/prev_btn.png) no-repeat center center / cover;}
 #recommend .top_nav .go_home > button {font-size: 16px; line-height: normal; color: #747474;}
@@ -44,5 +44,8 @@
 
 .map_lists {position: absolute; width: 100%; height: 20vh; overflow: hidden auto; top: 100px; z-index: 100; background-color: #fff;}
 
-#rec_swiper .next_btn {width: 100%;  padding: 0 20px; position: fixed; bottom: 60px; left: 0; z-index: 100;}
-#rec_swiper .next_btn > button {width: 100%; padding: 18px 0; background-color: #00bff9; color: #fff; border-radius: 10px; text-align: center; font-size: 16px; font-weight: 600; }
+#recommend .next_btn {width: 100%; max-width: 500px; padding: 0 20px; position: fixed; bottom: 60px; left: 50%; transform: translate(-50%,0); z-index: 100;}
+#recommend .next_btn > button {width: 100%; padding: 18px 0; background-color: #00bff9; color: #fff; border-radius: 10px; text-align: center; font-size: 16px; font-weight: 600; transition: all linear 0.2s; }
+#recommend .next_btn > button[type='submit'] {background-color: #00242e;}
+
+#recommend .next_btn > button:disabled {background-color: #e6e6e6; color: #747474;} 

@@ -7,6 +7,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
   const [address, setAddress] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [coords, setCoords] = useState(null);
+  const [selected, setSelected] = useState(false);
 
   // 지도 초기화
   useEffect(() => {
@@ -39,6 +40,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
   const handleSelectPlace = (place) => {
     const lat = place.y;
     const lng = place.x;
+    const placeName =place.place_name
     const moveLatLon = new window.kakao.maps.LatLng(lat, lng);
 
     map.panTo(moveLatLon);
@@ -49,12 +51,22 @@ function KakaoMapSearch({onSelectCoordinate}) {
     });
 
     setCoords({ lat, lng });
-
+    setSelected(true);
     // 부모에게 좌표 전달
     if (onSelectCoordinate) {
-      onSelectCoordinate(lat, lng);
+      onSelectCoordinate(lat, lng, placeName, true);
     }
   };
+
+  useEffect(() => {
+    if (searchResults.length === 0) {
+      setSelected(false);
+      if (onSelectCoordinate) {
+        onSelectCoordinate(null, null, null, false);
+      }
+    }
+  }, [searchResults]);
+
 
   return (
     <div>
