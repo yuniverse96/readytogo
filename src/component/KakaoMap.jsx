@@ -55,11 +55,13 @@ function KakaoMapSearch({onSelectCoordinate}) {
     setSelected(true);
     setSearch(false);
     setAddress(placeName);
-    setSearchResults([]);
     // 부모에게 좌표 전달
     if (onSelectCoordinate) {
       onSelectCoordinate(lat, lng, placeName, true);
+
     }
+
+
   };
 
   useEffect(() => {
@@ -83,6 +85,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
               onChange={(e) => {
                 setAddress(e.target.value);
                 setSearch(true);
+                setSearchResults([]);
               }}
               showLabel="search_input"
               placeholder="목적지를 입력해 주세요."
@@ -93,7 +96,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
 
           {/* 검색 결과 리스트 */}
           <div className='search_list'>
-            {searchResults.length > 0 && (
+            {search && searchResults.length > 0 && (
               <ul className='map_lists'>
                 {searchResults.map((place) => (
                   <li
