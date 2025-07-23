@@ -5,7 +5,7 @@
 /*인풋 공동 레이아웃*/
 .input_compo {width: 100%; display: flex; flex-direction: column; gap: 6px;}
 .input_wrap {position: relative;  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; width: 100%; height: 56px; padding: 0px 16px; border: 1px solid #d8dadc; background-color: #fff; position: relative; border-radius: 10px; transition: all linear 0.2s; }
-.input_wrap:focus-within {border: 1px solid #00bff9; }
+/* .input_wrap:focus-within {border: 1px solid #00bff9; } */
 .input_wrap > input {width: auto; flex: 1 1 50%; height: 100%; font-size: 14px;}
 
 /*인풋 내부 라벨*/

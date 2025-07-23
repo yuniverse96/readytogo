@@ -8,6 +8,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
   const [searchResults, setSearchResults] = useState([]);
   const [coords, setCoords] = useState(null);
   const [selected, setSelected] = useState(false);
+  const [search, setSearch] = useState(true);
 
   // 지도 초기화
   useEffect(() => {
@@ -25,7 +26,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
   // 주소/장소 검색
   const handleSearch = () => {
     const places = new window.kakao.maps.services.Places();
-
+    setSearch(true);
     places.keywordSearch(address, function (data, status) {
       if (status === window.kakao.maps.services.Status.OK) {
         setSearchResults(data); // 결과 저장
@@ -52,6 +53,8 @@ function KakaoMapSearch({onSelectCoordinate}) {
 
     setCoords({ lat, lng });
     setSelected(true);
+    setSearch(false);
+    setAddress(placeName);
     // 부모에게 좌표 전달
     if (onSelectCoordinate) {
       onSelectCoordinate(lat, lng, placeName, true);
@@ -69,43 +72,49 @@ function KakaoMapSearch({onSelectCoordinate}) {
 
 
   return (
-    <div>
-        <AuthInput
-            label=""
-            type="text"
-            name="adress"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            showLabel="top"
-            placeholder="주소를 입력해 주세요."
-            showBtn="check"
-            onButtonClick={handleSearch}
-            btnText="검색"
-        />
+    <>
+        <div className={`search_box ${search ? 'on' : ''}`}>
+          <AuthInput
+              label=""
+              type="text"
+              name="adress"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
+                setSearch(true);
+              }}
+              showLabel="search_input"
+              placeholder="목적지를 입력해 주세요."
+              showBtn="search"
+              onButtonClick={handleSearch}
+              btnText="검색"
+          />
 
-{/* 
-      <button onClick={handleSearch}>검색</button> */}
+          {/* 검색 결과 리스트 */}
+          <div className='search_list'>
+            {searchResults.length > 0 && (
+              <ul className='map_lists'>
+                {searchResults.map((place) => (
+                  <li
+                    key={place.id}
+                    onClick={() => handleSelectPlace(place)}
+                    className= 'adress'
+                  >
+                    <h4>{place.place_name}</h4>
+                    <p>{place.road_address_name || place.address_name}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
 
       {/* 지도 표시 */}
-      <div ref={mapRef} className="map_area" />
+      <div className='map_box'>
+        <div ref={mapRef} className="map_area" />
+      </div>
 
-      {/* 검색 결과 리스트 */}
-      {searchResults.length > 0 && (
-        <ul className='map_lists'>
-          {searchResults.map((place) => (
-            <li
-              key={place.id}
-              onClick={() => handleSelectPlace(place)}
-              className= 'adress'
-            >
-              <h4>{place.place_name}</h4>
-              <p>{place.road_address_name || place.address_name}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-
-    </div>
+    </>
   );
 }
 

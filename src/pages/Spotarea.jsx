@@ -79,6 +79,7 @@ function SpotArea() {
           date: dateStr,
         });
         alert('제출 완료!');
+        //navigate('/result_closet');
         // 제출 후 초기화할 때도 formData가 null이면 에러날 수 있음 주의
         setFormData({
           meetingPlace: '',
@@ -92,16 +93,36 @@ function SpotArea() {
       console.log('docId:', docId);
       console.log('formData:', formData);
     };
+
+    const handleGoBack = () => {
+        if (window.history.length > 1) {
+          navigate(-1);
+        } else {
+          navigate('/home'); // 기본 경로로
+        }
+      };
   
     return (
-      <div className="select-location-page">
-        <h2>만남 장소를 선택해주세요</h2>
-        <form onSubmit={handleSubmit} id="recommendForm">
-          <KakaoMapSearch onSelectCoordinate={handleCoordinateSelect} />
-          <button type="submit" disabled={!isPlaceSelected}>
-            추천받기
-          </button>
-        </form>
+      <div id="map">
+           <div className="top_nav">
+                <div className="btn_wrap prev_btn">
+                <button onClick={handleGoBack}>이전</button>
+                </div>
+                <div className="btn_wrap go_home">
+                <button type="button" onClick={() => navigate('/home')}>
+                    나가기
+                </button>
+                </div>
+            </div>
+        <div className='map_wrap'>
+            <div className='top_title'>
+                오늘 갈 곳은 어디인가요?
+            </div>
+            <form onSubmit={handleSubmit} id="recommendForm">
+              <KakaoMapSearch onSelectCoordinate={handleCoordinateSelect} />
+              <div className='submit_btn'><button type="submit" disabled={!isPlaceSelected}>추천받기</button></div>
+            </form>
+        </div>
       </div>
     );
   }
