@@ -15,13 +15,13 @@ function Recommend() {
     const navigate = useNavigate();
     const swiperRef = useRef(null);
     const { user } = useContext(AuthContext);
-    const [isPlaceSelected, setIsPlaceSelected] = useState(false);
     const inputRef = useRef(null);
     const spanRef = useRef(null);
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isNextEnabled, setIsNextEnabled] = useState(false);
     
+    console.log(user.uid);
  
   
     const topWearOptions = ['긴팔티', '반팔티','후드티', '민소매', '니트', '셔츠', '얇은 아우터','두꺼운 아우터'];
@@ -60,8 +60,6 @@ function Recommend() {
         return data.bottomWear.length > 0 || data.bottomInner.length > 0;
       case 5:
         return true;
-      default:
-        return false;
     }
   };
   
@@ -78,6 +76,8 @@ function Recommend() {
 
 
   const [isLastSlide, setIsLastSlide] = useState(false);
+
+
   const handleSwiper = (where) => {
     if (swiperRef.current && where === 'next') {
       swiperRef.current.slideNext();
@@ -85,6 +85,39 @@ function Recommend() {
       swiperRef.current.slidePrev();
     }
   };
+
+  const handleTempSaveAndGo = async () => {
+    if (!user) {
+      alert('로그인 후 이용해주세요.');
+      return;
+    }
+  
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const docId = `${user.uid}_${dateStr}`;
+    try {
+      const { meetingPlace, coordinates, ...rest } = formData; // 위치 정보 제외
+      await setDoc(doc(db, 'recommendations', docId), {
+        ...rest,
+        uid: user.uid,
+        email: user.email,
+        date: dateStr,
+      });
+
+      console.log({
+        ...formData,
+        uid: user.uid,
+        email: user.email,
+        date: dateStr,
+      });
+      
+  
+      navigate('/spotarea'); // 다음 페이지로 이동
+    } catch (error) {
+      console.error('임시 저장 실패:', error);
+      alert('임시 저장에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+  
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({
@@ -104,57 +137,7 @@ function Recommend() {
   };
   
 
-  const handleCoordinateSelect = (lat, lng, placeName, selected) => {
-    setFormData((prev) => ({
-      ...prev,
-      coordinates: { lat, lng },
-      meetingPlace: placeName,
-    }));
-    setIsPlaceSelected(selected);
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!user) {
-      alert('로그인 후 이용해주세요.');
-      return;
-    }
-
-    // 오늘 날짜 "YYYY-MM-DD" 형식으로 만들기
-    const dateStr = new Date().toISOString().slice(0, 10);
-    const docId = `${user.uid}_${dateStr}`;
-
-    try {
-      await setDoc(doc(db, 'recommendations', docId), {
-        ...formData,
-        uid: user.uid,
-        email: user.email,
-        date: dateStr,
-      });
-      alert('제출 완료!');
-      setFormData({
-        gender: '',
-        age: '',
-        constitution:'',
-        season: '',
-        temperature: '',
-        topWear: [],
-        topInner: [],
-        bottomWear: [],
-        bottomInner: [],
-        accessory: [],
-        meetingPlace: '',
-        coordinates: { lat: null, lng: null },
-      });
-    } catch (error) {
-      console.error('제출 실패:', error);
-      alert('제출 실패했습니다. 다시 시도해주세요.');
-    }
-    console.log('docId:', docId);
-    console.log('formData:', formData);
-
-  };
 
   //온도 저장 인풋 길이 수정
   useEffect(() => {
@@ -178,7 +161,7 @@ function Recommend() {
         </div>
 
       </div>
-      <form id="recommendForm" onSubmit={handleSubmit}>
+      <form id="recommendForm">
         <Swiper
           onSwiper={(swiper) => (swiperRef.current = swiper)}
           onSlideChange={(swiper) => {
@@ -539,24 +522,29 @@ function Recommend() {
                     ))}
                 </ul>
             </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <KakaoMapSearch onSelectCoordinate={handleCoordinateSelect} />
-          </SwiperSlide>
-        
-         
+          </SwiperSlide>         
         </Swiper>
-       
+
+        
+
           <div className='next_btn'>
             {isLastSlide ? (
-              <button type="submit" form="recommendForm" disabled={!isPlaceSelected}>추천받기</button>
-            ) : (
-              <button type="button" onClick={() => handleSwiper('next')} disabled={!isNextEnabled}>다음으로</button>
-            )}
+                <button type="button" onClick={handleTempSaveAndGo}>
+                  다음 단계로
+                </button>
+              ) : (
+                <button type="button" onClick={() => handleSwiper('next')} disabled={!isNextEnabled}>
+                  다음으로
+                </button>
+              )}
           </div>
+
+        
+         
       </form>
     </div>
   );
 }
 
 export default Recommend;
+

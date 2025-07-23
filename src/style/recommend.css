@@ -5,6 +5,9 @@
 #recommend .top_nav .go_home > button {font-size: 16px; line-height: normal; color: #747474;}
 #recommend form {width: 100%; height: 100%;}
 #rec_swiper {width: 100%; height: 100%; margin-top: 13px; background-color: #f7f7f7;}
+.swiper-pagination-progressbar {height: 5px !important; border-radius: 4px; overflow: hidden; background-color: #fff;}
+.swiper-pagination-progressbar .swiper-pagination-progressbar-fill {height: 5px !important; display: inline-block; background-color: #00bff9 !important; border-radius: 999px !important; overflow: hidden;}
+
 #rec_swiper .swiper-slide {width: 100%; height: 100%; background-color: #f7f7f7;}
 #rec_swiper .form_select {width: 100%; height: 100%; padding-bottom: 50px; overflow: hidden auto;}
 #rec_swiper .form_select .top_title {width: 100%; padding: 35px 0; text-align: center; font-weight: bold; color: #00242e; font-size: 20px; line-height: normal;}
@@ -51,11 +54,13 @@
 #rec_swiper .form_select .temp p {font-size: 20px; font-weight: 500; color: #bcbcbc;}
 #rec_swiper .form_select .temp .temp_input.hsv::after {content: ""; margin-left: auto; display: block; width: 19px; height: 19px;  background: url(../../public/images/select.png) no-repeat center center / cover;}
 
-.map_area {width: 100vw; height: 100vh;}
-.map_lists {position: absolute; width: 100%; height: 20vh; overflow: hidden auto; top: 62px; z-index: 100; background-color: #fff;}
-
 #recommend .next_btn {width: 100%; max-width: 500px; padding: 0 20px; position: fixed; bottom: 60px; left: 50%; transform: translate(-50%,0); z-index: 100;}
 #recommend .next_btn > button {width: 100%; padding: 18px 0; background-color: #00bff9; color: #fff; border-radius: 10px; text-align: center; font-size: 16px; font-weight: 600; transition: all linear 0.2s; }
 #recommend .next_btn > button[type='submit'] {background-color: #00242e;}
 
 #recommend .next_btn > button:disabled {background-color: #e6e6e6; color: #747474;} 
+
+
+
+.map_area {width: 100%; aspect-ratio: 320 / 280;}
+.map_lists {position: absolute; width: 100%; height: 20vh; overflow: hidden auto; top: 62px; z-index: 100; background-color: #fff;}
