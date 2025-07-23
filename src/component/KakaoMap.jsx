@@ -55,6 +55,7 @@ function KakaoMapSearch({onSelectCoordinate}) {
     setSelected(true);
     setSearch(false);
     setAddress(placeName);
+    setSearchResults([]);
     // 부모에게 좌표 전달
     if (onSelectCoordinate) {
       onSelectCoordinate(lat, lng, placeName, true);

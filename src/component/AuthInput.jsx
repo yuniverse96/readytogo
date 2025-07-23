@@ -29,7 +29,7 @@ function AuthInput({
           placeholder={placeholder}
         />
         {showBtn === 'check' &&  <button className = {showBtn} type="button" onClick={onButtonClick}>{btnText}</button>}
-        {showBtn === 'search' &&  <button className = {showBtn} type="button" onClick={onButtonClick}>{btnText}</button>}
+        {showBtn === 'search' &&  <button className = {`${showBtn}_btn`} type="button" onClick={onButtonClick}>{btnText}</button>}
         {showBtn?.includes('show') && (
           <button className={showBtn} type="button" onClick={onButtonClick}>{btnText}</button>
         )}
