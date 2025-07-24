@@ -63,7 +63,7 @@
 
 
 /*지역*/
-#map {width: 100%; height: 100vh; padding: 40px 0 120px; overflow: hidden; background-color: #f7f7f7;}
+#map {width: 100%; height: 100vh; padding: 40px 20px 120px; overflow: hidden; background-color: #f7f7f7;}
 
 #map .top_nav {width: 100%; max-width: 500px; height: 40px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 50%; transform: translate(-50%,0);}
 #map .top_nav .prev_btn {width: 17px; height: 17px; overflow: hidden;}
@@ -73,22 +73,22 @@
 #map .map_wrap .top_title {width: 100%; padding: 35px 0; text-align: center; font-weight: bold; color: #00242e; font-size: 20px; line-height: normal;}
 #map .map_wrap .top_title h4 {color: #000; font-size: 14px; line-height: normal; margin-bottom: 14px;}
 #map .search_box {position: relative; width: 100%; height: 56px;}
-#map .search_box .search_list { display: none; width: 100%;  aspect-ratio: 360 / 285; padding: 70px 20px 16px; overflow: hidden;  position: absolute; top: -15px; left: 0; background-color: #fff; z-index: 30;}
+#map .search_box .search_list { display: none; width: 100%;  aspect-ratio: 360 / 220; border-radius: 0px 0px 10px 10px; padding: 7px 5px 5px 0px; overflow: hidden;  position: absolute; top: 56px; left: 0; background-color: #fff; z-index: 30; box-sizing: border-box;}
 #map .search_box.on:has(.has_v) .search_list {display: block;}
-#map .search_box .search_list ul {width: 100%; height: 100%; overflow: hidden auto; padding: 0px 3px 0px 10px; margin-top: 7px;}
+#map .search_box .search_list ul {width: 100%; height: 100%; overflow: hidden auto; padding: 0px 3px 0px 10px; }
 #map .search_box .search_list ul::-webkit-scrollbar { display: block; width: 5px; }
 #map .search_box .search_list ul::-webkit-scrollbar-thumb {display: block; width: 5px; background-color: #d9d9d9; border-radius: 10px;}
-#map .search_box .search_list ul li { padding: 8px 0 10px; border-bottom: 1px solid #f2f2f2;}
+#map .search_box .search_list ul li { padding: 8px 9px 10px; }
 #map .search_box .search_list ul li:last-child {border: unset;} 
 #map .search_box .search_list ul li h4 {font-size: 14px; font-weight: 500; line-height: normal; color: #00242e;}
 #map .search_box .search_list ul li p {font-size: 10px; font-weight: 400; line-height: normal; color: #bcbcbc;}
 
-#map .search_box .search_input {width: calc(100% - 40px); position: absolute; top: 0; left: 50%; transform: translate(-50%,0); z-index: 50; }
+#map .search_box .search_input {width: 100%; }
 #map .search_box .search_input .input_wrap,
 #map .search_box .search_input .input_wrap.has_v{border: 1px solid transparent;}
-#map .search_box.on:has(.has_v) .search_input .input_wrap{border: 1px solid #d8dadc !important;}
+#map .search_box.on:has(.has_v) .search_input .input_wrap{border-radius: 10px 10px 0 0; border-bottom: 1px solid #bcbcbc;}
 #map .search_box .search_input .input_wrap .search_btn {width: 18px; height: 18px; text-indent: -9999px; background: url(../../public/images/search_btn.png) no-repeat center center / cover;}
 
-#map .map_box {width: 100%; padding: 20px; box-sizing: border-box;}
+#map .map_box {width: 100%; padding: 20px 0; box-sizing: border-box;}
 #map .map_area {width: 100%;aspect-ratio: 320 / 280;}
 
