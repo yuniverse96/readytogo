@@ -20,8 +20,10 @@ function Recommend() {
 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isNextEnabled, setIsNextEnabled] = useState(false);
+
+    //영상 영하
+    const [temperatureSign, setTemperatureSign] = useState('+'); 
     
-    console.log(user.uid);
  
   
     const topWearOptions = ['긴팔티', '반팔티','후드티', '민소매', '니트', '셔츠', '얇은 아우터','두꺼운 아우터'];
@@ -94,22 +96,18 @@ function Recommend() {
   
     const dateStr = new Date().toISOString().slice(0, 10);
     const docId = `${user.uid}_${dateStr}`;
+    const signedTemperature = `${temperatureSign}${formData.temperature}`;
+
     try {
       const { meetingPlace, coordinates, ...rest } = formData; // 위치 정보 제외
       await setDoc(doc(db, 'recommendations', docId), {
         ...rest,
+        temperature: signedTemperature,
         uid: user.uid,
         email: user.email,
         date: dateStr,
       });
 
-      console.log({
-        ...formData,
-        uid: user.uid,
-        email: user.email,
-        date: dateStr,
-      });
-      
   
       navigate('/spotarea'); // 다음 페이지로 이동
     } catch (error) {
@@ -139,13 +137,6 @@ function Recommend() {
 
 
 
-  //온도 저장 인풋 길이 수정
-  useEffect(() => {
-    if (inputRef.current && spanRef.current) {
-      const width = spanRef.current.offsetWidth;
-      inputRef.current.style.width = `${width}px`; 
-    }
-  }, [formData.temperature]);
   
   return (
     <div id="recommend">
@@ -378,15 +369,37 @@ function Recommend() {
 
                 <div className='temp'>
                     <div className={formData.temperature ? 'temp_input hsv' : 'temp_input'}>
+                      <ul className='ud_btn'>
+                        <li className='btn_wrap min'>
+                              <input 
+                                  type="radio" 
+                                  id="below"
+                                  name="temp" 
+                                  value="below" 
+                                  checked={temperatureSign === '-'}
+                                  onChange={() => setTemperatureSign('-')} 
+                                  /> 
+                              <label htmlFor='below'>-</label>
+                          </li>
+                        <li className='btn_wrap pls'>
+                            <input 
+                                type="radio" 
+                                id="above"
+                                name="temp" 
+                                value="above" 
+                                checked={temperatureSign === '+'}
+                                onChange={() => setTemperatureSign('+')} 
+                                /> 
+                            <label htmlFor='above'>+</label>
+                        </li>
+                      </ul>
                     <input 
                         type='text'
                         inputMode="numeric"
                         name='temperature' 
                         id='temperature'
-                        ref={inputRef}
                         value={formData.temperature}
                         placeholder='0'
-                       
                         onChange={(e) => {
                           let value = e.target.value;
                       
@@ -395,7 +408,6 @@ function Recommend() {
                               handleChange('temperature', value);
                               return;
                             }
-                      
                             const num = parseInt(value, 10);
                             if (num >= -99 && num <= 99) {
                               handleChange('temperature', value);
@@ -403,9 +415,6 @@ function Recommend() {
                           }
                         }}
                       />
-                       <span ref={spanRef} className="input_mirror">
-                          {formData.temperature || '0'}
-                        </span>
                         <p>℃</p>
                     </div>
                    
