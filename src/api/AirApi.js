@@ -1,6 +1,6 @@
 // src/api/AirApi.js
 export const getAirQuality = async (stationName) => {
-    const serviceKey = encodeURIComponent(process.env.REACT_APP_AIRKOREA_API_KEY);
+    const serviceKey =  process.env.REACT_APP_AIRKOREA_API_KEY;
     const params = new URLSearchParams({
       serviceKey,
       returnType: 'json',

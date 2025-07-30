@@ -8,7 +8,7 @@
 #header .btn_all .ring {background:url(../../public/images/ring.png) no-repeat center center / cover;}  
 #header .btn_all .menu {background:url(../../public/images/menu.png) no-repeat center center / cover;}  
 
-#menu_pop {display: none; width: 100vw; height: 100vh; overflow: hidden; position: fixed; z-index: 999; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.40);}
+#menu_pop {display: none; width: 100vw; height: 100vh; max-width: 500px; overflow: hidden; position: fixed; z-index: 999; top: 0; left: 50%; transform: translate(-50%,0); background-color: rgba(0, 0, 0, 0.40);}
 #menu_pop.on {display: block;}
 #menu_pop .menu_card {width: 51%; min-height: 50%; background-color: #fff; position: absolute; top: 15px; right: 0; padding: 20px; border-radius: 10px 0px 0px 10px;}
 
