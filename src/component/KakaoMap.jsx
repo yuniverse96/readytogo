@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
+import useSearchStore from '../store/useSearchStore';
 import AuthInput from './AuthInput';
 
 function KakaoMapSearch({ onSelectCoordinate }) {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
-  const [address, setAddress] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [coords, setCoords] = useState(null);
   const [selected, setSelected] = useState(false);
   const [search, setSearch] = useState(true);
   const [isManualSelect, setIsManualSelect] = useState(false);
+
+  const address = useSearchStore((state) => state.address);
+  const setAddress = useSearchStore((state) => state.setAddress);
 
   // 지도 초기화
   useEffect(() => {
@@ -26,6 +29,8 @@ function KakaoMapSearch({ onSelectCoordinate }) {
 
   // 주소/장소 검색 함수
   const handleSearch = () => {
+    if (!address || address.trim() === '') return;
+
     const places = new window.kakao.maps.services.Places();
     setSearch(true);
     places.keywordSearch(address, function (data, status) {
@@ -46,7 +51,7 @@ function KakaoMapSearch({ onSelectCoordinate }) {
     }
 
     const delayDebounce = setTimeout(() => {
-      if (address.trim().length > 1) {
+      if (address && address.trim().length > 1) {
         handleSearch();
       } else {
         setSearchResults([]);
@@ -63,17 +68,19 @@ function KakaoMapSearch({ onSelectCoordinate }) {
     const placeName = place.place_name;
     const moveLatLon = new window.kakao.maps.LatLng(lat, lng);
 
-    map.panTo(moveLatLon);
+    if (map) {
+      map.panTo(moveLatLon);
 
-    new window.kakao.maps.Marker({
-      map,
-      position: moveLatLon,
-    });
+      new window.kakao.maps.Marker({
+        map,
+        position: moveLatLon,
+      });
+    }
 
     setCoords({ lat, lng });
     setSelected(true);
     setSearch(false);
-    setIsManualSelect(true); 
+    setIsManualSelect(true);
     setAddress(placeName);
 
     if (onSelectCoordinate) {
@@ -133,7 +140,6 @@ function KakaoMapSearch({ onSelectCoordinate }) {
       {/* 지도 표시 */}
       <div className="map_box">
         <div ref={mapRef} className="map_area" />
-        
       </div>
     </>
   );

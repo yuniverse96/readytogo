@@ -5,13 +5,18 @@ import { auth } from '../firebase';
 import { AuthContext } from '../AuthContext';
 import useUserId from '../hooks/useUserId';
 import { useWeather } from '../hooks/useWeather';
+import AuthInput from '../component/AuthInput';
+import useSearchStore from '../store/useSearchStore';
+import '../style/home.css'
 
 function HomeMain() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(AuthContext);
   const userId = useUserId();
 
-  // ✅ 여기서 lat/lon 상태 만들어서 geolocation으로 설정
+  const address = useSearchStore(state => state.address);
+  const setAddress = useSearchStore(state => state.setAddress);
+
   const [lat, setLat] = useState(null);
   const [lon, setLon] = useState(null);
 
@@ -30,39 +35,33 @@ function HomeMain() {
       console.error('이 브라우저는 위치 정보 기능을 지원하지 않음');
     }
   }, []);
-  
+
   const { weatherInfo, isLoading, error } = useWeather(); 
-
-
-  const handleButtonClick = async () => {
-    if (user) {
-      try {
-        await signOut(auth);
-        setUser(null);
-        navigate('/home');
-      } catch (error) {
-        console.error('로그아웃 실패:', error);
-      }
-    } else {
-      navigate('/login');
-    }
-  };
-
   if (isLoading) return <div>날씨 불러오는 중...</div>;
   if (error) return <div>날씨 에러 발생: {error.message}</div>;
 
+  const handleSearchClick = () => {
+    // 필요하면 여기서 searchAddress 유효성 검사 가능
+    navigate('/spotarea');
+  };
+
   return (
-    <div>
-      <h2>홈페이지</h2>
-      {user && userId && <p>{userId}님 반가워요</p>}
-
-      <button onClick={handleButtonClick}>
-        {user ? '로그아웃' : '로그인'}
-      </button>
-
-      <br /><br />
-
-      {user && <button onClick={() => navigate('/recommend')}>추천받기</button>}
+    <div id='home'>
+      <section className='top_area'>
+        {user && userId &&  <h2><b>{userId}</b>님, 안녕하세요!</h2>}
+        <AuthInput
+          label=""
+          type="text"
+          name="address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          showLabel="search_input"
+          placeholder="오늘 어디가세요?"
+          showBtn="search"
+          btnText="검색"
+          onButtonClick={handleSearchClick}
+        />
+      </section>
 
       {weatherInfo && (
         <div>
@@ -73,6 +72,8 @@ function HomeMain() {
           <p>대기질: {weatherInfo.PM10} ({weatherInfo.airQualityStatus})</p>
         </div>
       )}
+
+      {user && <button type='button' className='go_recommend' onClick={() => navigate('/recommend')}>추천받기</button>}
     </div>
   );
 }

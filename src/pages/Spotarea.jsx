@@ -1,11 +1,10 @@
-
-
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { AuthContext } from '../AuthContext';
 import KakaoMapSearch from '../component/KakaoMap';
+import useSearchStore from '../store/useSearchStore';
 import '../style/recommend.css';
 
 function SpotArea() {
@@ -15,7 +14,9 @@ function SpotArea() {
     const [formData, setFormData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isPlaceSelected, setIsPlaceSelected] = useState(false);
-  
+    const setAddress = useSearchStore(state => state.setAddress);
+    
+
     useEffect(() => {
       const fetchData = async () => {
         if (!user) return; // user 없으면 fetch 중단
@@ -59,7 +60,7 @@ function SpotArea() {
       }));
       setIsPlaceSelected(selected);
     };
-  
+
     const handleSubmit = async (e) => {
       e.preventDefault();
   
@@ -79,7 +80,8 @@ function SpotArea() {
           date: dateStr,
         });
         alert('제출 완료!');
-        //navigate('/result_closet');
+        setAddress('');
+        navigate('/result_closet');
         // 제출 후 초기화할 때도 formData가 null이면 에러날 수 있음 주의
         setFormData({
           meetingPlace: '',

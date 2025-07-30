@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import Header from './component/Header';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Welcome from './pages/Welcome';
@@ -12,6 +13,7 @@ import Intro from './pages/Intro';
 function Main() {
     return (
       <div id="wrap">
+          <Header />
           <Routes>
             <Route path="/" element={<Intro />} />
             <Route path='/home' element={<Home />}></Route>
