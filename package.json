@@ -4,10 +4,12 @@
   "private": true,
   "homepage": "https://yuniverse96.github.io/readytogo",
   "dependencies": {
+    "@tanstack/react-query": "^5.83.0",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.11.0",
     "firebase": "^11.10.0",
     "gsap": "^3.13.0",
     "react": "^19.1.0",

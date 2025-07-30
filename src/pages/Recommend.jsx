@@ -7,7 +7,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import { Pagination, EffectFade } from 'swiper/modules';
 import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';  // setDoc으로 변경
+import { doc, setDoc } from 'firebase/firestore'; 
 import { AuthContext } from '../AuthContext';
 import '../style/recommend.css';
 

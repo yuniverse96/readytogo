@@ -133,6 +133,7 @@ function KakaoMapSearch({ onSelectCoordinate }) {
       {/* 지도 표시 */}
       <div className="map_box">
         <div ref={mapRef} className="map_area" />
+        
       </div>
     </>
   );
