@@ -6,6 +6,6 @@
 #home .top_area .search_input .input_wrap {border: transparent 1px solid;}
 #home .top_area .search_input .input_wrap.has_v {border: 1px solid #00242e;}
 
-#home .go_recommend {position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 0); width: 50%; background-color: #00242e; color: #fff; text-align: center; }
+#home .go_recommend {position: fixed; bottom: 30px; left: 50%; max-width: 300px; transform: translate(-50%, 0); width: 50%; background-color: #00242e; color: #fff; text-align: center; }
 
 

@@ -13,7 +13,7 @@ import Intro from './pages/Intro';
 function Main() {
     return (
       <div id="wrap">
-          <Header />
+       
           <Routes>
             <Route path="/" element={<Intro />} />
             <Route path='/home' element={<Home />}></Route>

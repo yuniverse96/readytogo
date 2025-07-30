@@ -7,6 +7,8 @@ import useUserId from '../hooks/useUserId';
 import { useWeather } from '../hooks/useWeather';
 import AuthInput from '../component/AuthInput';
 import useSearchStore from '../store/useSearchStore';
+import Header from '../component/Header';
+
 import '../style/home.css'
 
 function HomeMain() {
@@ -47,6 +49,7 @@ function HomeMain() {
 
   return (
     <div id='home'>
+         <Header />
       <section className='top_area'>
         {user && userId &&  <h2><b>{userId}</b>님, 안녕하세요!</h2>}
         <AuthInput
