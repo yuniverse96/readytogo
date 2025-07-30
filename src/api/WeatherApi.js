@@ -95,8 +95,7 @@ export const getShortTermForecast = async (nx, ny, base_date, base_time) => {
       },
     });
   
-    console.log('📦 API 응답:', response.data);
-  
+
     // 방어 로직 추가
     if (
       response.data.response &&

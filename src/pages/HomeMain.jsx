@@ -72,7 +72,7 @@ function HomeMain() {
           <p>기온: {weatherInfo.TMP} °C</p>
           <p>습도: {weatherInfo.REH} % ({weatherInfo.humidityStatus})</p>
           <p>풍속: {weatherInfo.WSD} m/s ({weatherInfo.windSpeedStatus})</p>
-          <p>대기질: {weatherInfo.PM10} ({weatherInfo.airQualityStatus})</p>
+          <p>대기질: {weatherInfo.pm10} ({weatherInfo.airQualityStatus})</p>
         </div>
       )}
 
