@@ -1,12 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ReactComponent as Sunnny } from '../asset/sunny.svg';
-import { ReactComponent as PartlyCloudy } from '../asset/partlyCloudy.svg';
-import { ReactComponent as Rainy } from '../asset/rainy.svg';
-import { ReactComponent as Snowy } from '../asset/snowy.svg';
-import { ReactComponent as RainThunder } from '../asset/rainThunder.svg';
 import { ReactComponent as Cloudy } from '../asset/cloudy.svg';
-import { ReactComponent as Thunder } from '../asset/thunder.svg';
+import { ReactComponent as Rainy } from '../asset/rainy.svg';
 
 
 const IconWeather = ({ type }) => {
@@ -16,7 +12,7 @@ const IconWeather = ({ type }) => {
     if (!iconRef.current) return;
 
     gsap.killTweensOf(iconRef.current); // 이전 애니메이션 제거
-
+    //맑음
     if (type === 'sunny') {
       const tl = gsap.timeline();
     
@@ -49,44 +45,72 @@ const IconWeather = ({ type }) => {
         }
       );
       
-    } else {
+    } else if(type === 'overcast')  {
+      //흐림
+      const tl = gsap.timeline({ repeat: -1, yoyo: true });
+          tl.to(iconRef.current, {x: -2,  y: -8, rotation: 2, duration: 3, ease: 'sine.inOut' })
+          .to(iconRef.current, {x: 2, y: 0, rotation: -2, duration: 3, ease: 'sine.inOut' });
+    } else if(type === 'rain') {
+
+      const cloud = iconRef.current.querySelector('.cloud');
+      const drops = iconRef.current.querySelectorAll('.drop'); 
+
+      // 모든 애니메이션 초기화
+
+      gsap.killTweensOf(cloud);
+      gsap.killTweensOf(drops);
+
+       // 구름 흔들림 애니메이션
+      if (cloud) {
+        const tl = gsap.timeline({ repeat: -1, yoyo: true });
+        tl.to(cloud, { y: 4, rotation: 0, duration: 3, ease: 'sine.inOut' })
+          .to(cloud, { y: 0, rotation: 0, duration: 3, ease: 'sine.inOut' });
+      }
+  
+      drops.forEach((drop, index) => {
+        gsap.fromTo(
+          drop,
+          { y: 0, opacity: 1 },
+          {
+            y: 15,             // 15px 아래로 떨어짐
+            opacity: 0,        // 점점 사라짐
+            duration: 0.7,
+            ease: 'power1.in',
+            repeat: -1,
+            repeatDelay: 0.3,
+            yoyo: false,
+            delay: index * 0.2, // 빗방울마다 딜레이 달리해서 연달아 떨어지는 효과
+          }
+        );
+      });
+    }
+     else {
       // sunny가 아니면 그냥 opacity 1로 유지
       gsap.to(iconRef.current, { opacity: 1, y: 0, rotate: 0, duration: 0.3 });
     }
   }, [type]);
-
   const renderIcon = () => {
     switch (type) {
       case 'sunny':
         return (
           <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
-            <Sunnny width={100} height={100} />
+            <Sunnny />
           </div>
         );
-      case 'partlyCloudy':
-        return (
-          <div ref={iconRef}>
-            <PartlyCloudy width={100} height={100} />
-          </div>
-        );
+
+      case 'overcast':
+      return (
+        <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
+          <Cloudy/>
+        </div>
+      );
       case 'rain':
-        return (
-          <div ref={iconRef}>
-            <Rainy width={100} height={100} />
-          </div>
-        );
-      case 'snow':
-        return (
-          <div ref={iconRef}>
-            <Snowy width={100} height={100} />
-          </div>
-        );
-      case 'thunder':
-        return (
-          <div ref={iconRef}>
-            <RainThunder width={100} height={100} />
-          </div>
-        );
+      return (
+        <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
+          <Rainy/>
+        </div>
+      );
+     
       default:
         return null;
     }

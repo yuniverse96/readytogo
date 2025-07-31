@@ -135,12 +135,29 @@ const SKY_ICON_MAP = {
   '4': 'overcast',   // 흐림
 };
 
+const WEATHER_DESCRIPTION_MAP = {
+  'rain_overcast': '하늘이 흐리고 비가 내려요.',
+  'rain_cloudy': '구름이 많고, 비가내려요.',
+  'rain_sunny': '비가오고,',
+  'snow_cloudy': '구름이 많고, 눈이와요.',
+  'rain': '비가 내리고,',
+  'snow': '눈이 오고,',
+  'overcast': '하늘이 흐리고,',
+  'cloudy': '구름이 많고,',
+  'sunny': '맑은 날씨예요.',
+  'rain_snow_cloudy': '구름이 많고 비와 눈이 내려요.',
+  // 필요시 더 추가 가능
+};
+
 function getWeatherIcon(pty, sky) {
   const icons = [];
 
+  // 강수 상태가 0이 아닐 때만 icon에 추가
   if (pty && pty !== '0') {
     icons.push(PTY_ICON_MAP[pty] || 'unknown');
   }
+
+  // sky는 무조건 추가
   if (sky) {
     icons.push(SKY_ICON_MAP[sky] || 'unknown');
   }
@@ -165,8 +182,6 @@ export const useWeather = (lat, lon, targetHour) => {
     setLastRefreshTime(new Date());
   };
 
-
-
   // 좌표 바뀔 때 카카오 API로 지역명 가져오기
   useEffect(() => {
     if (!lat || !lon) return;
@@ -186,8 +201,7 @@ export const useWeather = (lat, lon, targetHour) => {
       }
     });
   }, [lat, lon]);
-
-  const extractDistrict = locationName => {
+  const extractDistrict = (locationName) => {
     if (!locationName) return '';
     const parts = locationName.split(' ');
     return parts.length > 1 ? parts[1] : locationName;
@@ -229,6 +243,8 @@ export const useWeather = (lat, lon, targetHour) => {
     staleTime: 1000 * 60 * 60,
   });
 
+
+  const district = extractDistrict(locationName);
   // 대기질 API
   const {
     data: airData,
@@ -236,8 +252,8 @@ export const useWeather = (lat, lon, targetHour) => {
     error: airError,
     refetch: refetchAir,
   } = useQuery({
-    queryKey: ['airQuality', '구로구'], // 필요 시 위치 기반 측정소명 가져오는 로직 추가 가능
-    queryFn: () => getAirQuality('구로구'),
+    queryKey: ['airQuality', district], // 필요 시 위치 기반 측정소명 가져오는 로직 추가 가능
+    queryFn: () => getAirQuality(district),
     staleTime: 1000 * 60 * 10,
   });
 
@@ -268,7 +284,13 @@ export const useWeather = (lat, lon, targetHour) => {
   }
 
   if (weatherInfo) {
-    weatherInfo.weatherIcon = getWeatherIcon(weatherInfo.PTY, weatherInfo.SKY);
+    const icon = getWeatherIcon(weatherInfo.PTY, weatherInfo.SKY);
+    const description = WEATHER_DESCRIPTION_MAP[icon] || '날씨 정보를 불러올 수 없어요';
+  
+    weatherInfo.weatherIcon = icon;
+    weatherInfo.weatherDescription = description;
+    weatherInfo.weatherColor = SKY_ICON_MAP[weatherInfo.SKY] || 'unknown';
+  
   }
 
   if (weatherInfo && yesterdayForecastData) {

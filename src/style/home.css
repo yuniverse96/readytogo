@@ -9,6 +9,10 @@
 
 #home .weather_wrap {width: 100%; display: flex; flex-direction: column; gap: 15px;}
 #home .weather_wrap .weather_big {width: 100%; padding: 20px;  background-color: #00bff9; border-radius: 20px; overflow: hidden;}
+#home .weather_wrap .weather_big.sunny {background-color: #00bff9;} 
+#home .weather_wrap .weather_big.cloudy,
+#home .weather_wrap .weather_big.overcast {background-color: #9bb5bd;} 
+
 #home .weather_wrap .weather_big .refresh {height: 1.5em; overflow: hidden; cursor: pointer; position: relative; display: flex; justify-content: flex-end; align-items: center; margin-bottom: 18px;  color: #fff; font-size: 14px; }
 #home .weather_wrap .weather_big .refresh p { position:absolute; top: 0; right: 20px;}
 #home .weather_wrap .weather_big .refresh::after {content: ""; display: block; width: 16px; height: 16px; background:url(../../public/images/refresh.png) no-repeat center center / cover;} 

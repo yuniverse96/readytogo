@@ -169,7 +169,7 @@ function HomeMain() {
 
       {weatherInfo && (
              <section className='weather_wrap'>
-             <div className='weather_big'>
+             <div className={`weather_big ${weatherInfo.weatherColor}`}>
                <div className='refresh' onClick={handleRefreshClick} >
                     <p
                       ref={firstRef}
@@ -191,11 +191,11 @@ function HomeMain() {
                </div>
 
                <div className='icon_box'>
-                 {/* type에 날씨정보가 들어가면 알맞에 아이콘이 변경됨. 현재 임시 sunny*/}
-                 <IconWeather type="sunny"></IconWeather>
+                 {/* type에 날씨정보가 들어가면 알맞에 아이콘이 변경됨. 현재 임시 sunny */}
+                 <IconWeather type={weatherInfo.weatherIcon} />
                </div>
                <h3>{weatherInfo.TMP}°C</h3>
-               <p className='weather_txt'>{weatherInfo?.tempComparisonMsg}</p>
+               <p className='weather_txt'>{weatherInfo.weatherDescription}{weatherInfo?.tempComparisonMsg}</p>
              </div>
              <ul className='weather_condition'>
                <li className={`wind ${getStatusClass(weatherInfo.windSpeedStatus)}`}><p>바람 {weatherInfo.windSpeedStatus}</p></li>
@@ -205,8 +205,9 @@ function HomeMain() {
 
               <div>강수상태: {weatherInfo.PTY}</div>
               <div>하늘상태: {weatherInfo.SKY}</div>
-              <div>작동명: {weatherInfo.weatherIcon}</div>
-
+              <div>icon명: {weatherInfo.weatherIcon}</div>
+              
+              
            </section>
       )}
 
