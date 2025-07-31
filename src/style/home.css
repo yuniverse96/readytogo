@@ -6,6 +6,27 @@
 #home .top_area .search_input .input_wrap {border: transparent 1px solid;}
 #home .top_area .search_input .input_wrap.has_v {border: 1px solid #00242e;}
 
+
+#home .weather_wrap {width: 100%; display: flex; flex-direction: column; gap: 15px;}
+#home .weather_wrap .weather_big {width: 100%; padding: 20px;  background-color: #00bff9; border-radius: 20px; overflow: hidden;}
+
+#home .weather_wrap .weather_condition {width: 100%; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;}
+#home .weather_wrap .weather_condition li {width: 10px; flex: 1 1 20%; background-color: #fff; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+#home .weather_wrap .weather_condition li p {font-size: 11px; font-weight: 500;}
+#home .weather_wrap .weather_condition li.wind {color: #47d237;}
+#home .weather_wrap .weather_condition li.reh {color: #ffa710;}
+#home .weather_wrap .weather_condition li.air {color: #00bff9;}
+
+/*svg아이콘*/
+#home .weather_wrap .weather_big .icon_box { width: 40%; aspect-ratio: 1/1; margin: 0 auto;}
+#home .weather_wrap .weather_big .icon_box div {width: 100%; height: 100%;}
+#home .weather_wrap .weather_big .icon_box div svg {width: 100%; height: 100%;}
+
+#home .weather_wrap .weather_big h3 {font-size: 36px; font-weight: 600; color: #fff; text-align: center;}
+#home .weather_wrap .weather_big .weather_txt {color: #fff; padding-bottom: 10px; font-weight: 500; text-align: center;}
+
+
+
 #home .go_recommend {position: fixed; bottom: 30px; left: 50%; max-width: 300px; transform: translate(-50%, 0); width: 50%; background-color: #00242e; color: #fff; text-align: center; }
 
 

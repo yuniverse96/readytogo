@@ -8,6 +8,7 @@ import { useWeather } from '../hooks/useWeather';
 import AuthInput from '../component/AuthInput';
 import useSearchStore from '../store/useSearchStore';
 import Header from '../component/Header';
+import IconWeather from '../component/IconWeather';
 
 import '../style/home.css'
 
@@ -39,8 +40,8 @@ function HomeMain() {
   }, []);
 
   const { weatherInfo, isLoading, error } = useWeather(); 
-  if (isLoading) return <div>날씨 불러오는 중...</div>;
-  if (error) return <div>날씨 에러 발생: {error.message}</div>;
+  // if (isLoading) return <div>날씨 불러오는 중...</div>;
+  // if (error) return <div>날씨 에러 발생: {error.message}</div>;
 
   const handleSearchClick = () => {
     // 필요하면 여기서 searchAddress 유효성 검사 가능
@@ -48,9 +49,11 @@ function HomeMain() {
   };
 
   return (
+    
     <div id='home'>
          <Header />
-      <section className='top_area'>
+        
+       <section className='top_area'>
         {user && userId &&  <h2><b>{userId}</b>님, 안녕하세요!</h2>}
         <AuthInput
           label=""
@@ -67,15 +70,28 @@ function HomeMain() {
       </section>
 
       {weatherInfo && (
-        <div>
-          <h2>날씨 정보</h2>
-          <p>기온: {weatherInfo.TMP} °C</p>
-          <p>습도: {weatherInfo.REH} % ({weatherInfo.humidityStatus})</p>
-          <p>풍속: {weatherInfo.WSD} m/s ({weatherInfo.windSpeedStatus})</p>
-          <p>대기질: {weatherInfo.pm10} ({weatherInfo.airQualityStatus})</p>
-        </div>
+             <section className='weather_wrap'>
+             <div className='weather_big'>
+               <p className='refresh'>ㅇㅇ시,ㅇㅇ구</p>
+               <div className='icon_box'>
+                 {/* type에 날씨정보가 들어가면 알맞에 아이콘이 변경됨. 현재 임시 sunny*/}
+                 <IconWeather type="sunny"></IconWeather>
+               </div>
+               <h3>{weatherInfo.TMP}°C</h3>
+               <p className='weather_txt'>{weatherInfo?.tempComparisonMsg}</p>
+             </div>
+             <ul className='weather_condition'>
+               <li className='wind'><p>바람 {weatherInfo.windSpeedStatus}</p></li>
+               <li className='reh'><p>습도 {weatherInfo.humidityStatus}</p></li>
+               <li className='air'><p>대기질 {weatherInfo.airQualityStatus}</p></li>
+             </ul>
+           </section>
       )}
 
+
+
+         
+     
       {user && <button type='button' className='go_recommend' onClick={() => navigate('/recommend')}>추천받기</button>}
     </div>
   );
