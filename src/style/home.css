@@ -9,13 +9,21 @@
 
 #home .weather_wrap {width: 100%; display: flex; flex-direction: column; gap: 15px;}
 #home .weather_wrap .weather_big {width: 100%; padding: 20px;  background-color: #00bff9; border-radius: 20px; overflow: hidden;}
+#home .weather_wrap .weather_big .refresh {height: 1.5em; overflow: hidden; cursor: pointer; position: relative; display: flex; justify-content: flex-end; align-items: center; margin-bottom: 18px;  color: #fff; font-size: 14px; }
+#home .weather_wrap .weather_big .refresh p { position:absolute; top: 0; right: 20px;}
+#home .weather_wrap .weather_big .refresh::after {content: ""; display: block; width: 16px; height: 16px; background:url(../../public/images/refresh.png) no-repeat center center / cover;} 
+
 
 #home .weather_wrap .weather_condition {width: 100%; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;}
-#home .weather_wrap .weather_condition li {width: 10px; flex: 1 1 20%; background-color: #fff; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;}
-#home .weather_wrap .weather_condition li p {font-size: 11px; font-weight: 500;}
-#home .weather_wrap .weather_condition li.wind {color: #47d237;}
-#home .weather_wrap .weather_condition li.reh {color: #ffa710;}
-#home .weather_wrap .weather_condition li.air {color: #00bff9;}
+#home .weather_wrap .weather_condition li {width: 10px; flex: 1 1 20%; padding: 7px 0; background-color: #fff; border-radius: 10px; display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: center;}
+#home .weather_wrap .weather_condition li p {font-size: 11px; line-height: normal; font-weight: 500;}
+#home .weather_wrap .weather_condition li.good {color: #00bff9;}
+#home .weather_wrap .weather_condition li.bad {color: #ffa710;}
+#home .weather_wrap .weather_condition li.soso {color: #47d237;}
+#home .weather_wrap .weather_condition li::before {content: ""; display: block; width: 24px; height: 24px;}
+#home .weather_wrap .weather_condition li.good::before {background:url(../../public/images/good.png) no-repeat center center / cover}
+#home .weather_wrap .weather_condition li.bad::before {background:url(../../public/images/bad.png) no-repeat center center / cover}
+#home .weather_wrap .weather_condition li.soso::before {background:url(../../public/images/soso.png) no-repeat center center / cover}
 
 /*svg아이콘*/
 #home .weather_wrap .weather_big .icon_box { width: 40%; aspect-ratio: 1/1; margin: 0 auto;}

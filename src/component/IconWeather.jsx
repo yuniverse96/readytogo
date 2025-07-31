@@ -5,6 +5,9 @@ import { ReactComponent as PartlyCloudy } from '../asset/partlyCloudy.svg';
 import { ReactComponent as Rainy } from '../asset/rainy.svg';
 import { ReactComponent as Snowy } from '../asset/snowy.svg';
 import { ReactComponent as RainThunder } from '../asset/rainThunder.svg';
+import { ReactComponent as Cloudy } from '../asset/cloudy.svg';
+import { ReactComponent as Thunder } from '../asset/thunder.svg';
+
 
 const IconWeather = ({ type }) => {
   const iconRef = useRef(null);
