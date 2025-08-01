@@ -137,6 +137,8 @@ function HomeMain() {
         return 'soso';
       case '나쁨':
         return 'bad';
+      case '매우 나쁨':
+        return 'sobad';
       default:
         return ''; // 혹시 모를 예외
     }
@@ -195,7 +197,7 @@ function HomeMain() {
                  <IconWeather type={weatherInfo.weatherIcon} />
                </div>
                <h3>{weatherInfo.TMP}°C</h3>
-               <p className='weather_txt'>{weatherInfo.weatherDescription}{weatherInfo?.tempComparisonMsg}</p>
+               <p className='weather_txt'>{weatherInfo.weatherDescription} {!weatherInfo.weatherIcon?.includes('_') && weatherInfo?.tempComparisonMsg}</p>
              </div>
              <ul className='weather_condition'>
                <li className={`wind ${getStatusClass(weatherInfo.windSpeedStatus)}`}><p>바람 {weatherInfo.windSpeedStatus}</p></li>

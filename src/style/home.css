@@ -23,10 +23,15 @@
 #home .weather_wrap .weather_condition li p {font-size: 11px; line-height: normal; font-weight: 500;}
 #home .weather_wrap .weather_condition li.good {color: #00bff9;}
 #home .weather_wrap .weather_condition li.bad {color: #ffa710;}
+#home .weather_wrap .weather_condition li.sobad {color: #e64646;}
 #home .weather_wrap .weather_condition li.soso {color: #47d237;}
+
+
+
 #home .weather_wrap .weather_condition li::before {content: ""; display: block; width: 24px; height: 24px;}
 #home .weather_wrap .weather_condition li.good::before {background:url(../../public/images/good.png) no-repeat center center / cover}
 #home .weather_wrap .weather_condition li.bad::before {background:url(../../public/images/bad.png) no-repeat center center / cover}
+#home .weather_wrap .weather_condition li.sobad::before {background:url(../../public/images/sobad.png) no-repeat center center / cover}
 #home .weather_wrap .weather_condition li.soso::before {background:url(../../public/images/soso.png) no-repeat center center / cover}
 
 /*svg아이콘*/

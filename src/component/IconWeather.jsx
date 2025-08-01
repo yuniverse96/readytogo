@@ -50,7 +50,7 @@ const IconWeather = ({ type }) => {
       const tl = gsap.timeline({ repeat: -1, yoyo: true });
           tl.to(iconRef.current, {x: -2,  y: -8, rotation: 2, duration: 3, ease: 'sine.inOut' })
           .to(iconRef.current, {x: 2, y: 0, rotation: -2, duration: 3, ease: 'sine.inOut' });
-    } else if(type === 'rain') {
+    } else if (type === 'rain' || type === 'rain_overcast')  {
 
       const cloud = iconRef.current.querySelector('.cloud');
       const drops = iconRef.current.querySelectorAll('.drop'); 
@@ -105,6 +105,7 @@ const IconWeather = ({ type }) => {
         </div>
       );
       case 'rain':
+      case 'rain_overcast':
       return (
         <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
           <Rainy/>
