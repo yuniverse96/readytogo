@@ -6,7 +6,6 @@ import {
   convertGRID_GPS,
   getBaseDateTime,
 } from '../api/WeatherApi';
-import { getAirQuality } from '../api/AirApi';
 
 const DEFAULT_COORDINATES = {
   lat: 37.5665,  // 서울시 중구
@@ -71,7 +70,7 @@ const getTempComparisonMessage = (todayTemp, yesterdayTemp, currentMonth) => {
     },
     fall: {
       up: ['어제와 비슷해요.', '약간 따뜻해졌어요.', '더 따뜻해졌어요.', '훨씬 더 따뜻해졌어요.'],
-      down: ['약간 쌀쌀해졌어요.', '더 쌀쌀해졌어요.', '훨씬 더 쌀쌀해졌어요.'],
+      down: ['약간 쌀쌀해졌어요.', '더 쌀쌀졌어요.', '훨씬 더 쌀쌀해졌어요.'],
     },
   };
 
@@ -110,10 +109,13 @@ const getWindSpeedStatus = wsd => {
 
 // 대기질 상태 판단
 const getAirQualityStatus = pm10 => {
-  if (pm10 === undefined || pm10 === null) return '정보 없음';
-  if (pm10 <= 25) return '좋음';
-  if (pm10 <= 50) return '보통';
-  if (pm10 <= 75) return '나쁨';
+  if (pm10 === undefined || pm10 === null || isNaN(Number(pm10))) return '정보 없음';
+
+  const value = Number(pm10);
+
+  if (value <= 30) return '좋음';
+  if (value <= 80) return '보통';
+  if (value <= 150) return '나쁨';
   return '매우 나쁨';
 };
 
@@ -171,7 +173,6 @@ export const useWeather = (lat, lon, targetHour) => {
   const [sidoName, setSidoName] = useState('서울'); // 초기값
   const [lastRefreshTime, setLastRefreshTime] = useState(null);
 
- 
   useEffect(() => {
     if (lat && lon) {
       setCoordinates({ lat, lon });
@@ -198,7 +199,7 @@ export const useWeather = (lat, lon, targetHour) => {
         const region = result.find(r => r.region_type === 'H'); // 가장 정확한 구역
         if (region) {
           const cityName = extractCityName(region); // 여기에 '서울', '광주', '성남' 등이 나옴
-          
+
           setSidoName(cityName);
           setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
         }
@@ -210,16 +211,15 @@ export const useWeather = (lat, lon, targetHour) => {
   }, [lat, lon]);
   const extractCityName = (region) => {
     const { region_1depth_name, region_2depth_name } = region;
-  
+
     // 1depth가 ~특별시, ~광역시, 세종특별자치시면 그대로 사용
     if (/(특별시|광역시|세종)/.test(region_1depth_name)) {
       return region_1depth_name.replace(/(특별시|광역시|특별자치시)/, '');
     }
-  
+
     // 나머지 (ex: 경기도, 충청남도 등)는 2depth 사용
     return region_2depth_name.replace(/시$/, ''); // '성남시' → '성남' 등 정리
   };
-
 
   // 좌표 변환 (GRID 좌표)
   const { base_date, base_time } = getBaseDateTime();
@@ -254,21 +254,49 @@ export const useWeather = (lat, lon, targetHour) => {
     queryKey: ['shortTermForecast', nx, ny, yesterdayDate, base_time],
     queryFn: () => getShortTermForecast(nx, ny, yesterdayDate, base_time),
     enabled: !!nx && !!ny,
-    staleTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 60,       // 1시간 캐시
+    refetchInterval: 1000 * 60 * 60, // 1시간마다 재요청
+    retry: 1,                       // 재시도 1회로 줄임
   });
 
-
-
-  // 대기질 API
+  // 대기질 API - 여기서 fetch 직접 호출해서 resultCode 검사하고 에러 처리
   const {
     data: airData,
     isLoading: airLoading,
     error: airError,
     refetch: refetchAir,
   } = useQuery({
-    queryKey: ['airQuality', sidoName], // 필요 시 위치 기반 측정소명 가져오는 로직 추가 가능
-    queryFn: () => getAirQuality(sidoName),
-    staleTime: 1000 * 60 * 10,
+    queryKey: ['airQuality', sidoName],
+    queryFn: async () => {
+      const serviceKey = process.env.REACT_APP_AIRKOREA_API_KEY;
+      const params = new URLSearchParams({
+        serviceKey,
+        returnType: 'json',
+        sidoName,
+        numOfRows: '100',
+        pageNo: '1',
+        ver: '1.0',
+      });
+      const url = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${params.toString()}`;
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP 에러: ${res.status}`);
+      }
+      const json = await res.json();
+
+      if (json.response?.header?.resultCode !== '00') {
+        throw new Error(`API 오류: ${json.response.header.resultMsg || '알 수 없음'}`);
+      }
+
+      return json.response.body.items || [];
+    },
+    staleTime: 1000 * 60 * 60,  // 1시간 캐시
+    retry: 1,
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+    onError: (error) => {
+      console.error('대기질 API 에러:', error);
+    },
   });
 
   let weatherInfo = null;
@@ -291,20 +319,47 @@ export const useWeather = (lat, lon, targetHour) => {
   }
 
   if (weatherInfo && airData) {
-    const pm10 = Number(airData.pm10Value);
-    weatherInfo.pm10 = pm10;
-    weatherInfo.pm10Grade = airData.pm10Grade;
-    weatherInfo.airQualityStatus = getAirQualityStatus(pm10);
+    let firstStation = null;
+
+    if (Array.isArray(airData)) {
+      if (airData.length > 0) {
+        firstStation = airData[0];
+      }
+    } else if (typeof airData === 'object' && airData !== null) {
+      firstStation = airData;
+    }
+
+    if (firstStation) {
+      const pm10Raw = firstStation.pm10Value;
+
+      const isValidPm10 =
+        pm10Raw !== null &&
+        pm10Raw !== undefined &&
+        pm10Raw !== '' &&
+        pm10Raw !== '-' &&
+        !isNaN(Number(pm10Raw));
+
+      const pm10 = isValidPm10 ? Number(pm10Raw) : NaN;
+
+      if (!isNaN(pm10)) {
+        weatherInfo.pm10 = pm10;
+        weatherInfo.pm10Grade = pm10Raw;
+        weatherInfo.airQualityStatus = getAirQualityStatus(pm10);
+      } else {
+        weatherInfo.pm10 = null;
+        weatherInfo.pm10Grade = pm10Raw;
+        weatherInfo.airQualityStatus = '정보 없음';
+      }
+    }
   }
 
   if (weatherInfo) {
     const icon = getWeatherIcon(weatherInfo.PTY, weatherInfo.SKY);
     const description = WEATHER_DESCRIPTION_MAP[icon] || '날씨 정보를 불러올 수 없어요';
-  
+
     weatherInfo.weatherIcon = icon;
     weatherInfo.weatherDescription = description;
     weatherInfo.weatherColor = SKY_ICON_MAP[weatherInfo.SKY] || 'unknown';
-  
   }
 
   if (weatherInfo && yesterdayForecastData) {
@@ -329,7 +384,7 @@ export const useWeather = (lat, lon, targetHour) => {
     error: forecastError || airError,
     weatherInfo,
     locationName,
-    lastRefreshTime, 
+    lastRefreshTime,
     refetch: () => {
       refetchForecast();
       refetchAir();

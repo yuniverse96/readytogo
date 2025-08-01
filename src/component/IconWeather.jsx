@@ -3,6 +3,8 @@ import { gsap } from 'gsap';
 import { ReactComponent as Sunnny } from '../asset/sunny.svg';
 import { ReactComponent as Cloudy } from '../asset/cloudy.svg';
 import { ReactComponent as Rainy } from '../asset/rainy.svg';
+import { ReactComponent as Snowy } from '../asset/snowy.svg';
+import { ReactComponent as Overcast } from '../asset/partlyCloudy.svg';
 
 
 const IconWeather = ({ type }) => {
@@ -45,12 +47,42 @@ const IconWeather = ({ type }) => {
         }
       );
       
-    } else if(type === 'overcast')  {
-      //흐림
+    } else if(type === 'cloudy')  {
+      //구름많음
       const tl = gsap.timeline({ repeat: -1, yoyo: true });
           tl.to(iconRef.current, {x: -2,  y: -8, rotation: 2, duration: 3, ease: 'sine.inOut' })
           .to(iconRef.current, {x: 2, y: 0, rotation: -2, duration: 3, ease: 'sine.inOut' });
-    } else if (type === 'rain' || type === 'rain_overcast')  {
+    }else if (type === 'overcast') {
+      const rays = iconRef.current.querySelector('.rays');
+      const cloud = iconRef.current.querySelector('#cloud');
+      if (!cloud) return;
+    
+      if (!rays) return;
+    
+      gsap.killTweensOf(rays);
+    
+      gsap.fromTo(
+        rays,
+        { scale: 1, transformOrigin: '32px 32px' },
+        {
+          scale: 1.1,
+          duration: 1.5,
+          ease: 'power1.inOut',
+          yoyo: true,
+          repeat: -1,
+          transformOrigin:'32px 32px',
+        }
+      );
+
+      gsap.to(cloud, {
+        x: 5,           // 좌우 흔들림 강도 (5px 왔다 갔다)
+        duration: 2,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+      });
+    }
+     else if (type === 'rain' || type === 'rain_overcast')  {
 
       const cloud = iconRef.current.querySelector('.cloud');
       const drops = iconRef.current.querySelectorAll('.drop'); 
@@ -83,7 +115,33 @@ const IconWeather = ({ type }) => {
           }
         );
       });
+    } else if (type === 'snow') {
+      const snowLayer = iconRef.current.querySelector('.snow-layer');
+    
+      const createSnowflake = () => {
+        const flake = document.createElement('div');
+        flake.classList.add('flake');
+        flake.style.left = `${Math.random() * 100}%`;
+        flake.style.width = `${Math.random() * 5 + 5}px`;
+        flake.style.height = flake.style.width;
+        flake.style.opacity = Math.random() * 0.5 + 0.5;
+        snowLayer.appendChild(flake);
+    
+        gsap.to(flake, {
+          y: 300,
+          duration: Math.random() * 3 + 3,
+          ease: 'none',
+          onComplete: () => flake.remove(),
+        });
+      };
+    
+      const interval = setInterval(() => {
+        createSnowflake();
+      }, 300);
+    
+      return () => clearInterval(interval);
     }
+    
      else {
       // sunny가 아니면 그냥 opacity 1로 유지
       gsap.to(iconRef.current, { opacity: 1, y: 0, rotate: 0, duration: 0.3 });
@@ -99,6 +157,12 @@ const IconWeather = ({ type }) => {
         );
 
       case 'overcast':
+        return (
+          <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
+            <Overcast/>
+          </div>
+        );
+      case 'cloudy':
       return (
         <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
           <Cloudy/>
@@ -109,6 +173,13 @@ const IconWeather = ({ type }) => {
       return (
         <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
           <Rainy/>
+        </div>
+      );
+      case 'snow':
+      return (
+        <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
+          <Snowy/>
+          <div className="snow-layer"></div>
         </div>
       );
      
