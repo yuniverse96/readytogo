@@ -167,7 +167,8 @@ function getWeatherIcon(pty, sky) {
 
 export const useWeather = (lat, lon, targetHour) => {
   const [coordinates, setCoordinates] = useState(null);
-  const [locationName, setLocationName] = useState('서울특별시 중구'); // 초기값
+  const [locationName, setLocationName] = useState('서울특별시 중구');
+  const [sidoName, setSidoName] = useState('서울'); // 초기값
   const [lastRefreshTime, setLastRefreshTime] = useState(null);
 
  
@@ -194,18 +195,31 @@ export const useWeather = (lat, lon, targetHour) => {
     const geocoder = new window.kakao.maps.services.Geocoder();
     geocoder.coord2RegionCode(lon, lat, (result, status) => {
       if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
-        const region = result[0];
-        setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
+        const region = result.find(r => r.region_type === 'H'); // 가장 정확한 구역
+        if (region) {
+          const cityName = extractCityName(region); // 여기에 '서울', '광주', '성남' 등이 나옴
+          
+          setSidoName(cityName);
+          setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
+        }
       } else {
+        setSidoName('서울');
         setLocationName('서울특별시 중구');
       }
     });
   }, [lat, lon]);
-  const extractDistrict = (locationName) => {
-    if (!locationName) return '';
-    const parts = locationName.split(' ');
-    return parts.length > 1 ? parts[1] : locationName;
+  const extractCityName = (region) => {
+    const { region_1depth_name, region_2depth_name } = region;
+  
+    // 1depth가 ~특별시, ~광역시, 세종특별자치시면 그대로 사용
+    if (/(특별시|광역시|세종)/.test(region_1depth_name)) {
+      return region_1depth_name.replace(/(특별시|광역시|특별자치시)/, '');
+    }
+  
+    // 나머지 (ex: 경기도, 충청남도 등)는 2depth 사용
+    return region_2depth_name.replace(/시$/, ''); // '성남시' → '성남' 등 정리
   };
+
 
   // 좌표 변환 (GRID 좌표)
   const { base_date, base_time } = getBaseDateTime();
@@ -244,7 +258,7 @@ export const useWeather = (lat, lon, targetHour) => {
   });
 
 
-  const district = extractDistrict(locationName);
+
   // 대기질 API
   const {
     data: airData,
@@ -252,8 +266,8 @@ export const useWeather = (lat, lon, targetHour) => {
     error: airError,
     refetch: refetchAir,
   } = useQuery({
-    queryKey: ['airQuality', district], // 필요 시 위치 기반 측정소명 가져오는 로직 추가 가능
-    queryFn: () => getAirQuality(district),
+    queryKey: ['airQuality', sidoName], // 필요 시 위치 기반 측정소명 가져오는 로직 추가 가능
+    queryFn: () => getAirQuality(sidoName),
     staleTime: 1000 * 60 * 10,
   });
 
