@@ -7,6 +7,7 @@ import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { AuthContext } from '../AuthContext';
 import useUserId from '../hooks/useUserId';
 import { useWeather } from '../hooks/useWeather';
+import {useShortWeather} from '../hooks/useShortWeather';
 import AuthInput from '../component/AuthInput';
 import useSearchStore from '../store/useSearchStore';
 import Header from '../component/Header';
@@ -74,9 +75,10 @@ function HomeMain() {
 
 
 
-  const { weatherInfo, locationName,lastRefreshTime, isLoading, error, refetch } = useWeather(lat,lon); 
+  // const { weatherInfo, locationName,lastRefreshTime, isLoading, error, refetch } = useWeather(lat,lon); 
   // if (isLoading) return <div>날씨 불러오는 중...</div>;
   // if (error) return <div>날씨 에러 발생: {error.message}</div>;
+  const { weatherInfo, locationName, lastRefreshTime, isLoading, error, refetch } = useShortWeather(lat, lon);
 
   const handleRefreshClick = () => {
     refetch(); // 데이터 재요청
@@ -193,11 +195,13 @@ function HomeMain() {
                </div>
 
                <div className='icon_box'>
-                 {/* type에 날씨정보가 들어가면 알맞에 아이콘이 변경됨. 현재 임시 sunny */}
+                 {/* type에 날씨정보가 들어가면 알맞게 아이콘이 변경됨.  */}
                  <IconWeather type={weatherInfo.weatherIcon} />
                </div>
-               <h3>{weatherInfo.TMP}°C</h3>
-               <p className='weather_txt'>{weatherInfo.weatherDescription} {!weatherInfo.weatherIcon?.includes('_') && weatherInfo?.tempComparisonMsg}</p>
+               <div className='info_box'>
+                 <h3>{weatherInfo.T1H}°C</h3>
+                 <p className='weather_txt'>{weatherInfo.weatherDescription} {!weatherInfo.weatherIcon?.includes('_') && weatherInfo?.tempComparisonMsg}</p>
+               </div>
              </div>
              <ul className='weather_condition'>
                <li className={`wind ${getStatusClass(weatherInfo.windSpeedStatus)}`}><p>바람 {weatherInfo.windSpeedStatus}</p></li>
@@ -205,7 +209,7 @@ function HomeMain() {
                <li className={`air ${getStatusClass(weatherInfo.airQualityStatus)}`}><p>대기질 {weatherInfo.airQualityStatus}</p></li>
              </ul>
 
-              <div>강수상태: {weatherInfo.PTY}</div>
+              <div>강수상태: {weatherInfo.RN1}</div>
               <div>하늘상태: {weatherInfo.SKY}</div>
               <div>icon명: {weatherInfo.weatherIcon}</div>
               
