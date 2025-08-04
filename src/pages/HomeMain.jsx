@@ -130,6 +130,7 @@ function HomeMain() {
   
   };
 
+
   //환경 상태
   const getStatusClass = (status) => {
     switch (status) {
@@ -171,51 +172,56 @@ function HomeMain() {
         />
       </section>
 
-      {weatherInfo && (
-             <section className='weather_wrap'>
-             <div className={`weather_big ${weatherInfo.weatherColor}`}>
-               <div className='refresh' onClick={handleRefreshClick} >
-                    <p
-                      ref={firstRef}
-                      style={{
-                        opacity: showFirst ? 1 : 0,
-                       }}
-                    >
-                      {locationName}
-                    </p>
-                    <p
-                      ref={secondRef}
-                      style={{
-                        opacity: showFirst ? 0 : 1,
-                        y:0
-                      }}
-                    >
-                      {getTimeSinceRefresh(lastRefreshTime)}
-                    </p>
-               </div>
+      <section className='weather_wrap'>
+  <div className={`weather_big ${weatherInfo?.weatherColor || 'default'}`}>
+    <div className='refresh' onClick={handleRefreshClick}>
+      <p
+        ref={firstRef}
+        style={{ opacity: showFirst ? 1 : 0 }}
+      >
+        {locationName || "위치 정보 없음"}
+      </p>
+      <p
+        ref={secondRef}
+        style={{ opacity: showFirst ? 0 : 1 }}
+      >
+        {getTimeSinceRefresh(lastRefreshTime) || "최근 업데이트 없음"}
+      </p>
+    </div>
 
-               <div className='icon_box'>
-                 {/* type에 날씨정보가 들어가면 알맞게 아이콘이 변경됨.  */}
-                 <IconWeather type={weatherInfo.weatherIcon} />
-               </div>
-               <div className='info_box'>
-                 <h3>{weatherInfo.T1H}°C</h3>
-                 <p className='weather_txt'>{weatherInfo.weatherDescription} {!weatherInfo.weatherIcon?.includes('_') && weatherInfo?.tempComparisonMsg}</p>
-               </div>
-             </div>
-             <ul className='weather_condition'>
-               <li className={`wind ${getStatusClass(weatherInfo.windSpeedStatus)}`}><p>바람 {weatherInfo.windSpeedStatus}</p></li>
-               <li className={`reh ${getStatusClass(weatherInfo.humidityStatus)}`}><p>습도 {weatherInfo.humidityStatus}</p></li>
-               <li className={`air ${getStatusClass(weatherInfo.airQualityStatus)}`}><p>대기질 {weatherInfo.airQualityStatus}</p></li>
-             </ul>
+    <div className='icon_box'>
+      {weatherInfo
+        ? <IconWeather type={weatherInfo.weatherIcon} />
+        : <div className="placeholder-icon"></div>}
+    </div>
 
-              <div>강수상태: {weatherInfo.RN1}</div>
-              <div>하늘상태: {weatherInfo.SKY}</div>
-              <div>icon명: {weatherInfo.weatherIcon}</div>
-              
-              
-           </section>
-      )}
+    <div className='info_box'>
+      <h3>{weatherInfo?.T1H ? `${weatherInfo.T1H}°C` : "정보 없음"}</h3>
+      <p className='weather_txt'>
+        {weatherInfo
+          ? `${weatherInfo.weatherDescription}`
+          : "날씨 정보를 불러올 수 없습니다"}
+      </p>
+    </div>
+  </div>
+
+  <ul className='weather_condition'>
+    <li className={`wind ${getStatusClass(weatherInfo?.windSpeedStatus)}`}>
+      <p>바람 {weatherInfo?.windSpeedStatus || "정보 없음"}</p>
+    </li>
+    <li className={`reh ${getStatusClass(weatherInfo?.humidityStatus)}`}>
+      <p>습도 {weatherInfo?.humidityStatus || "정보 없음"}</p>
+    </li>
+    <li className={`air ${getStatusClass(weatherInfo?.airQualityStatus)}`}>
+      <p>대기질 {weatherInfo?.airQualityStatus || "정보 없음"}</p>
+    </li>
+  </ul>
+
+  <div>강수상태: {weatherInfo?.RN1 || "정보 없음"}</div>
+  <div>하늘상태: {weatherInfo?.SKY || "정보 없음"}</div>
+  <div>icon명: {weatherInfo?.weatherIcon || "정보 없음"}</div>
+</section>
+
 
 
 
