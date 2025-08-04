@@ -90,6 +90,7 @@ export const useShortWeather = (lat, lon, targetTime) => {
   const [coordinates, setCoordinates] = useState(null);
   const [locationName, setLocationName] = useState('서울특별시 중구');
   const [sidoName, setSidoName] = useState('서울');
+  const [localArea, setLocalArea] = useState('서울');
   const [lastRefreshTime, setLastRefreshTime] = useState(null);
 
   useEffect(() => {
@@ -100,7 +101,9 @@ export const useShortWeather = (lat, lon, targetTime) => {
   useEffect(() => {
     if (!lat || !lon) return;
     if (!window.kakao?.maps?.services) {
+    setSidoName('서울');
       setLocationName('서울특별시 중구');
+      setLocalArea('서울');
       return;
     }
 
@@ -112,14 +115,18 @@ export const useShortWeather = (lat, lon, targetTime) => {
 
             if (region) {
                 const cityName = extractCityName(region);
+                const localAreaName = extractLocalArea(region.region_1depth_name);
+                
                 if (cityName !== sidoName) {
                 setSidoName(cityName);
                 }
                 setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
+                setLocalArea(localAreaName);
             }
       } else {
         setSidoName('서울');
         setLocationName('서울특별시 중구');
+        setLocalArea('서울');
       }
     });
   }, [lat, lon]);
@@ -141,7 +148,31 @@ export const useShortWeather = (lat, lon, targetTime) => {
   
     return region_2depth_name; // fallback
   };
+  //지역명 변환
+  const extractLocalArea = (region1depth) => {
+    const map = {
+      '서울특별시': '서울',
+      '부산광역시': '부산',
+      '대구광역시': '대구',
+      '인천광역시': '인천',
+      '광주광역시': '광주',
+      '대전광역시': '대전',
+      '울산광역시': '울산',
+      '세종특별자치시': '세종',
+      '경기도': '경기',
+      '강원도': '강원',
+      '충청북도': '충북',
+      '충청남도': '충남',
+      '전라북도': '전북',
+      '전라남도': '전남',
+      '경상북도': '경북',
+      '경상남도': '경남',
+      '제주특별자치도': '제주'
+    };
+    return map[region1depth] || region1depth;
+  };
   
+
 
   // 시간 처리 - 초단기예보는 targetTime: "HHmm" 형식 (예: "1430")를 받아서 그대로 쓰거나 없으면 현재 시간 기준으로 세팅
   const { base_date, base_time } = getBaseDateTime(targetTime);
@@ -171,9 +202,11 @@ export const useShortWeather = (lat, lon, targetTime) => {
     }
   });
 
+
   useEffect(() => {
     console.log('sidoName 변경:', sidoName);
-  }, [sidoName]);
+    console.log ('local 변경', localArea)
+  }, [sidoName,localArea]);
   // 대기질 API 쿼리 (기존 그대로)
   const {
     data: airData,
@@ -181,8 +214,8 @@ export const useShortWeather = (lat, lon, targetTime) => {
     error: airError,
     refetch: refetchAir,
   } = useQuery({
-    queryKey: ['airQuality', sidoName],
-    queryFn: () => getAirQuality(sidoName), // 쉼표 하나만!
+    queryKey: ['airQuality', localArea],
+    queryFn: () => getAirQuality(localArea),
     staleTime: 1000 * 60 * 60,
     retry: 1,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
