@@ -93,6 +93,9 @@ export const useShortWeather = (lat, lon, targetTime) => {
   const [localArea, setLocalArea] = useState('서울');
   const [lastRefreshTime, setLastRefreshTime] = useState(null);
 
+  // 에러 상태 관리용 state 추가
+  const [hasError, setHasError] = useState(false);
+
   useEffect(() => {
     if (lat && lon) setCoordinates({ lat, lon });
   }, [lat, lon]);
@@ -193,7 +196,10 @@ export const useShortWeather = (lat, lon, targetTime) => {
     queryFn: () => getUltraShortTermForecast(nx, ny, base_date, base_time),
     enabled: !!nx && !!ny,
     staleTime: 1000 * 60 * 5,
-    refetchInterval: 1000 * 60 * 3,
+    cacheTime: 1000 * 60 * 60,
+    retry: 3,
+    retryDelay: attempt => Math.min(1000 * 2 ** attempt, 30000),
+    refetchInterval: hasError ? 10000 : false,
     onSuccess: (data) => {
       console.log('초단기예보 API 성공:', data);
     },
@@ -207,6 +213,9 @@ export const useShortWeather = (lat, lon, targetTime) => {
     console.log('sidoName 변경:', sidoName);
     console.log ('local 변경', localArea)
   }, [sidoName,localArea]);
+  
+
+
   // 대기질 API 쿼리 (기존 그대로)
   const {
     data: airData,
@@ -214,15 +223,23 @@ export const useShortWeather = (lat, lon, targetTime) => {
     error: airError,
     refetch: refetchAir,
   } = useQuery({
-    queryKey: ['airQuality', localArea],
-    queryFn: () => getAirQuality(localArea),
-    staleTime: 1000 * 60 * 60,
-    retry: 1,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-    onError: (error) => {
-      console.error('대기질 API 에러:', error);
-    },
-  });
+  queryKey: ['airQuality', localArea],
+  queryFn: async () => {
+    const result = await getAirQuality(localArea);
+    if (!result) {
+      // API 실패 시 로컬스토리지 데이터 가져옴
+      const cached = localStorage.getItem(`airQuality-${localArea}`);
+      return cached ? JSON.parse(cached) : null;
+    }
+    return result;
+  },
+  staleTime: 1000 * 60 * 60,
+  retry: 1,
+  retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+  onError: (error) => {
+    console.error('대기질 API 에러:', error);
+  },
+});
   
 
   let weatherInfo = null;

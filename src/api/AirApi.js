@@ -10,13 +10,18 @@ export const getAirQuality = async (sidoName) => {
     ver: '1.0',
   });
 
-  const url = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${params.toString()}`;
+  const url = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${params}`;
+  const response = await fetch(url);
+  const result = await response.json();
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('시도별 실시간 대기질 정보를 가져오지 못했습니다');
+  const items = result?.response?.body?.items;
 
-  const json = await res.json();
+  if (!items || items.length === 0) {
+    console.warn('대기질 데이터 없음, 이전 캐시 사용 예정');
+    return null;
+  }
 
-  // 없으면 빈 배열 처리
-  return json.response?.body?.items || [];
+  // 성공하면 localStorage에 저장
+  localStorage.setItem(`airQuality-${sidoName}`, JSON.stringify(items));
+  return items;
 };

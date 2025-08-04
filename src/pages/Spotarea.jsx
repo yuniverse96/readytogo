@@ -31,7 +31,7 @@ function SpotArea() {
   
           if (docSnap.exists()) {
             const data = docSnap.data();
-            console.log("SpotArea loaded:", data);
+            // console.log("SpotArea loaded:", data);
             setFormData(data);
           } else {
             alert("이전 정보를 찾을 수 없습니다.");
@@ -92,8 +92,8 @@ function SpotArea() {
         console.error('제출 실패:', error);
         alert('제출 실패했습니다. 다시 시도해주세요.');
       }
-      console.log('docId:', docId);
-      console.log('formData:', formData);
+      // console.log('docId:', docId);
+      // console.log('formData:', formData);
     };
 
     const handleGoBack = () => {
