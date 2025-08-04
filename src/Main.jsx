@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Welcome from './pages/Welcome';
 import Recommend from './pages/Recommend'; 
 import Spotarea from './pages/Spotarea'; 
+import ResultCloset from './pages/ResultCloset'; 
 import './style/reset.css';
 import './style/common.css';
 import Intro from './pages/Intro';
@@ -21,6 +22,7 @@ function Main() {
             <Route path="/welcome" element={<Welcome />} /> 
             <Route path="/recommend" element={<Recommend />} />
             <Route path="/spotarea" element={<Spotarea />} />
+            <Route path="/result_closet" element={<ResultCloset />} />
           </Routes>
       </div>
     );

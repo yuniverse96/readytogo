@@ -93,21 +93,27 @@ function HomeMain() {
     }
     
     const db = getFirestore();
+    const uid = user?.uid; 
     const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
-    const docId = `${userId}${today}`;
-    const docRef = doc(db, "recommend", docId);
+    const docId = `${uid}_${today}`;
+    console.log(docId);
+    const docRef = doc(db, "recommendations", docId);
 
     try {
+      console.log('조회할 docId:', docId);
       const docSnap = await getDoc(docRef);
+      console.log('docSnap.exists():', docSnap.exists());
+      console.log('docSnap.data():', docSnap.data());
+    
       if (docSnap.exists()) {
         navigate('/spotarea');
       } else {
-        alert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주시면 도와드릴게요.")
+        alert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주시면 도와드릴게요.");
         navigate('/recommend');
       }
     } catch (error) {
-      console.error("파이어베이스 문서 조회 실패:", error);
-      // 실패했을때 강제로 추천하기로 이동.
+      alert("정보 조회 중 에러가 발생했습니다.");
+      console.error("Firestore 문서 조회 에러:", error);
       navigate('/recommend');
     }
   };
@@ -148,7 +154,6 @@ function HomeMain() {
   };
 
   return (
-    
     <div id='home'>
          <Header />
         

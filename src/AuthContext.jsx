@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  console.log(user)
+
   useEffect(() => {
     // Firebase Auth 로그인 상태 변화 감지
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
