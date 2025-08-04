@@ -6,7 +6,7 @@ getUltraShortTermForecast,         // 초단기 예보 API 함수 (가정)
   convertGRID_GPS,
   getBaseDateTime,
 } from '../api/RealtimeWeatherApi';
-
+import { getAirQuality } from '../api/AirApi';
 const DEFAULT_COORDINATES = {
     lat: 37.5665,  // 서울시 중구
     lon: 126.9780,
@@ -108,11 +108,15 @@ export const useShortWeather = (lat, lon, targetTime) => {
     geocoder.coord2RegionCode(lon, lat, (result, status) => {
       if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
         const region = result.find(r => r.region_type === 'H');
-        if (region) {
-          const cityName = extractCityName(region);
-          setSidoName(cityName);
-          setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
-        }
+       
+
+            if (region) {
+                const cityName = extractCityName(region);
+                if (cityName !== sidoName) {
+                setSidoName(cityName);
+                }
+                setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
+            }
       } else {
         setSidoName('서울');
         setLocationName('서울특별시 중구');
@@ -120,13 +124,24 @@ export const useShortWeather = (lat, lon, targetTime) => {
     });
   }, [lat, lon]);
 
+
+
   const extractCityName = (region) => {
     const { region_1depth_name, region_2depth_name } = region;
+  
     if (/(특별시|광역시|세종)/.test(region_1depth_name)) {
       return region_1depth_name.replace(/(특별시|광역시|특별자치시)/, '');
     }
-    return region_2depth_name.replace(/시$/, '');
+  
+    // region_2depth_name이 '용인시 수지구'처럼 복합명일 때 앞부분만 추출
+    const match = region_2depth_name.match(/^(\S+?)(시|군|구)/);
+    if (match) {
+      return match[1]; // '용인시 수지구' → '용인'
+    }
+  
+    return region_2depth_name; // fallback
   };
+  
 
   // 시간 처리 - 초단기예보는 targetTime: "HHmm" 형식 (예: "1430")를 받아서 그대로 쓰거나 없으면 현재 시간 기준으로 세팅
   const { base_date, base_time } = getBaseDateTime(targetTime);
@@ -156,7 +171,9 @@ export const useShortWeather = (lat, lon, targetTime) => {
     }
   });
 
-
+  useEffect(() => {
+    console.log('sidoName 변경:', sidoName);
+  }, [sidoName]);
   // 대기질 API 쿼리 (기존 그대로)
   const {
     data: airData,
@@ -165,28 +182,7 @@ export const useShortWeather = (lat, lon, targetTime) => {
     refetch: refetchAir,
   } = useQuery({
     queryKey: ['airQuality', sidoName],
-    queryFn: async () => {
-      const serviceKey = process.env.REACT_APP_AIRKOREA_API_KEY;
-      const params = new URLSearchParams({
-        serviceKey,
-        returnType: 'json',
-        sidoName,
-        numOfRows: '100',
-        pageNo: '1',
-        ver: '1.0',
-      });
-      const url = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${params.toString()}`;
-
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP 에러: ${res.status}`);
-      const json = await res.json();
-
-      if (json.response?.header?.resultCode !== '00') {
-        throw new Error(`API 오류: ${json.response.header.resultMsg || '알 수 없음'}`);
-      }
-
-      return json.response.body.items || [];
-    },
+    queryFn: () => getAirQuality(sidoName), // 쉼표 하나만!
     staleTime: 1000 * 60 * 60,
     retry: 1,
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -194,6 +190,7 @@ export const useShortWeather = (lat, lon, targetTime) => {
       console.error('대기질 API 에러:', error);
     },
   });
+  
 
   let weatherInfo = null;
 
