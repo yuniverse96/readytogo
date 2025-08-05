@@ -222,11 +222,31 @@ function HomeMain() {
         <div>icon명: {weatherInfo?.weatherIcon || "정보 없음"}</div> */}
       </section>
       <section className='recommend_wrap'>
-        <div className='recommend_today'  onClick={() => navigate('/result_closet')}>
+      <div 
+          className='recommend_today'  
+          onClick={() => {
+            if (!user) {
+              alert("로그인 후 이용해주세요!");
+              navigate('/login');
+              return;
+            }
+            navigate('/result_closet');
+          }}
+        >
           <h3>오늘의<br/>추천 코디</h3>
           <span className='icon_wrap'></span>
         </div>
-        <div className='recommend_write' onClick={() => navigate('/recommend')}>
+        <div 
+            className='recommend_write' 
+            onClick={() => {
+              if (!user) {
+                alert("로그인 후 이용해주세요!");
+                navigate('/login');
+                return;
+              }
+              navigate('/recommend');
+            }}
+          >
           <h3>오늘의<br/>체감 기록</h3>
           <span className='icon_wrap'></span>
         </div>

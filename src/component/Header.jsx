@@ -12,6 +12,7 @@ function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
   
     const handleButtonClick = async () => {
+      setIsMenuOpen(false);
     if (user) {
       try {
         await signOut(auth);
@@ -27,7 +28,6 @@ function Header() {
 
     const handleMenuClick = () => {
         setIsMenuOpen((prev) => !prev); 
-        console.log("??",isMenuOpen)
     };
 
     return (
@@ -43,8 +43,8 @@ function Header() {
           </div>
 
 
-          <div id='menu_pop' className={isMenuOpen ? 'on' : ''}>
-              <div className='menu_card'>
+          <div id='menu_pop' className={isMenuOpen ? 'on' : ''}  onClick={handleMenuClick}>
+              <div className='menu_card'  onClick={(e) => e.stopPropagation()}>
                  <button onClick={handleMenuClick}>
                     닫기
                 </button>  
