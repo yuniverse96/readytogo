@@ -1,4 +1,4 @@
-#home {width: 100%; height: 100vh; overflow: hidden auto; padding: 0 20px; background-color: #f7f7f7;}
+#home {width: 100%; height: 100vh; overflow: hidden auto; scroll-behavior: smooth; padding: 0 20px 60px; background-color: #f7f7f7;}
 #home .top_area {width: 100%; padding: 35px 0 15px;}
 #home .top_area h2 {font-size: 20px; line-height: normal; color: #00242e;}
 #home .top_area h2 b {font-weight: 600;}
@@ -19,7 +19,7 @@
 
 
 #home .weather_wrap .weather_condition {width: 100%; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;}
-#home .weather_wrap .weather_condition li {width: 10px; flex: 1 1 20%; padding: 7px 0; background-color: #fff; border-radius: 10px; display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: center;}
+#home .weather_wrap .weather_condition li {width: 10px; flex: 1 1 20%; padding: 7px 0; background-color: #fff; border-radius: 10px; display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05)}
 #home .weather_wrap .weather_condition li p {font-size: 11px; line-height: normal; font-weight: 500;}
 #home .weather_wrap .weather_condition li.good {color: #00bff9;}
 #home .weather_wrap .weather_condition li.bad {color: #ffa710;}
@@ -46,23 +46,36 @@
 #home .weather_wrap .weather_big .info_box .weather_txt {color: #fff; padding-bottom: 10px; font-weight: 500; text-align: center;}
 
 .snow-layer {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 10;
-  }
-  
-  .flake {
-    position: absolute;
-    top: 0;
-    background: white;
-    border-radius: 50%;
-    filter: blur(0.5px);
-  }
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}  
+.flake {
+  position: absolute;
+  top: 0;
+  background: white;
+  border-radius: 50%;
+  filter: blur(0.5px);
+}
 
-#home .go_recommend {position: fixed; bottom: 30px; left: 50%; max-width: 300px; transform: translate(-50%, 0); width: 50%; background-color: #00242e; color: #fff; text-align: center; }
+/*추천 영역*/
+#home .recommend_wrap {width: 100%; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; } 
+#home .recommend_wrap div {display: flex;  flex-wrap: wrap; margin-top: 15px; width: 10px; flex: 1 1 40%; border-radius: 10px; background-color: #fff; padding: 18px 10px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); cursor: pointer;}
+#home .recommend_wrap div h3 {width: 100%; margin-left: 9px; font-size: 14px; font-weight: 600; color: #00242e; line-height: normal}
+#home .recommend_wrap div .icon_wrap {display: inline-block; width: 38%; aspect-ratio: 1/1; margin-left: auto;}
+#home .recommend_wrap .recommend_today .icon_wrap {background:url(../../public/images/today.png) no-repeat center center / cover}
+#home .recommend_wrap .recommend_write .icon_wrap {background:url(../../public/images/write.png) no-repeat center center / cover}
+
+/*광고*/
+#home .ad_zone {width: 100%; margin-top: 15px; overflow: hidden;}
+#home .ad_zone .ad_banner {width: 100%;}
+#home .ad_zone .ad_banner > img {width: 100%; height: auto;}
+
+
+
 
 

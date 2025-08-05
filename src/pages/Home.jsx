@@ -19,7 +19,7 @@ function Home() {
   };
 
   return (
-    <div>
+    <>
     
 
       <Routes>
@@ -27,7 +27,7 @@ function Home() {
 
         <Route path="login/*" element={<Login />} />
       </Routes>
-    </div>
+    </>
   );
 }
 

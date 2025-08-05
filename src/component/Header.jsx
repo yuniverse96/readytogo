@@ -31,7 +31,7 @@ function Header() {
     };
 
     return (
-      <div>
+      <>
           <div id="header">
               <div className="logo" onClick={() => navigate('/home')}>
                   <img src={`${process.env.PUBLIC_URL}/images/h_logo.png`} alt="logo" />
@@ -54,7 +54,7 @@ function Header() {
               </div>
                 
           </div>
-      </div>
+      </>
 
 
     );
