@@ -111,7 +111,6 @@ export default function ResultCloset() {
 
   return (
     <div id='result_closet'>
-        <Header />
       <h2>오늘과 가장 가까운 추천 문서</h2>
       <pre>{JSON.stringify(nearestRec, null, 2)}</pre>
 

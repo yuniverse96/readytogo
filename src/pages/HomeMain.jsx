@@ -10,7 +10,7 @@ import { useWeather } from '../hooks/useWeather';
 import {useShortWeather} from '../hooks/useShortWeather';
 import AuthInput from '../component/AuthInput';
 import useSearchStore from '../store/useSearchStore';
-import Header from '../component/Header';
+
 import IconWeather from '../component/IconWeather';
 
 import '../style/home.css'
@@ -49,8 +49,6 @@ function HomeMain() {
 
     return () => clearInterval(interval);
   }, [showFirst]);
-
-  
 
   // 위치 요청 함수 분리
   const fetchCurrentPosition = () => {
@@ -154,85 +152,90 @@ function HomeMain() {
   };
 
   return (
-    <div id='home'>
-         <Header />
-        
+    <div id='home'>      
        <section className='top_area'>
-       {(user && userId) ? (
-          <h2><b>{userId}</b>님, 안녕하세요!</h2>
-        ) : (
-          <h2><b>방문자</b>님, 안녕하세요!</h2>
-        )}
-        <AuthInput
-          label=""
-          type="text"
-          name="address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          showLabel="search_input"
-          placeholder="오늘 어디가세요?"
-          showBtn="search"
-          btnText="검색"
-          onButtonClick={handleSearchClick}
-        />
+          {(user && userId) ? (
+              <h2><b>{userId}</b>님, 안녕하세요!</h2>
+            ) : (
+              <h2><b>방문자</b>님, 안녕하세요!</h2>
+            )}
+            <AuthInput
+              label=""
+              type="text"
+              name="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              showLabel="search_input"
+              placeholder="오늘 어디가세요?"
+              showBtn="search"
+              btnText="검색"
+              onButtonClick={handleSearchClick}
+            />
       </section>
 
       <section className='weather_wrap'>
-  <div className={`weather_big ${weatherInfo?.weatherColor || 'default'}`}>
-    <div className='refresh' onClick={handleRefreshClick}>
-      <p
-        ref={firstRef}
-        style={{ opacity: showFirst ? 1 : 0 }}
-      >
-        {locationName || "위치 정보 없음"}
-      </p>
-      <p
-        ref={secondRef}
-        style={{ opacity: showFirst ? 0 : 1 }}
-      >
-        {getTimeSinceRefresh(lastRefreshTime) || "최근 업데이트 없음"}
-      </p>
-    </div>
+          <div className={`weather_big ${weatherInfo?.weatherColor || 'default'}`}>
+            <div className='refresh' onClick={handleRefreshClick}>
+              <p
+                ref={firstRef}
+                style={{ opacity: showFirst ? 1 : 0 }}
+              >
+                {locationName || "위치 정보 없음"}
+              </p>
+              <p
+                ref={secondRef}
+                style={{ opacity: showFirst ? 0 : 1 }}
+              >
+                {getTimeSinceRefresh(lastRefreshTime) || "최근 업데이트 없음"}
+              </p>
+            </div>
 
-    <div className='icon_box'>
-      {weatherInfo
-        ? <IconWeather type={weatherInfo.weatherIcon} />
-        : <div className="placeholder-icon"></div>}
-    </div>
+            <div className='icon_box'>
+              {weatherInfo
+                ? <IconWeather type={weatherInfo.weatherIcon} />
+                : <div className="placeholder-icon"></div>}
+            </div>
 
-    <div className='info_box'>
-      <h3>{weatherInfo?.T1H ? `${weatherInfo.T1H}°C` : "정보 없음"}</h3>
-      <p className='weather_txt'>
-        {weatherInfo
-          ? `${weatherInfo.weatherDescription}`
-          : "날씨 정보를 불러올 수 없습니다"}
-      </p>
-    </div>
-  </div>
+            <div className='info_box'>
+              <h3>{weatherInfo?.T1H ? `${weatherInfo.T1H}°C` : "정보 없음"}</h3>
+              <p className='weather_txt'>
+                {weatherInfo
+                  ? `${weatherInfo.weatherDescription}`
+                  : "날씨 정보를 불러올 수 없습니다"}
+              </p>
+            </div>
+          </div>
 
-  <ul className='weather_condition'>
-    <li className={`wind ${getStatusClass(weatherInfo?.windSpeedStatus)}`}>
-      <p>바람 {weatherInfo?.windSpeedStatus || "정보 없음"}</p>
-    </li>
-    <li className={`reh ${getStatusClass(weatherInfo?.humidityStatus)}`}>
-      <p>습도 {weatherInfo?.humidityStatus || "정보 없음"}</p>
-    </li>
-    <li className={`air ${getStatusClass(weatherInfo?.airQualityStatus)}`}>
-      <p>대기질 {weatherInfo?.airQualityStatus || "정보 없음"}</p>
-    </li>
-  </ul>
-
-  <div>강수상태: {weatherInfo?.RN1 || "정보 없음"}</div>
-  <div>하늘상태: {weatherInfo?.SKY || "정보 없음"}</div>
-  <div>icon명: {weatherInfo?.weatherIcon || "정보 없음"}</div>
-</section>
-
-
-
-
-         
-     
-      {user && <button type='button' className='go_recommend' onClick={() => navigate('/recommend')}>추천받기</button>}
+          <ul className='weather_condition'>
+              <li className={`wind ${getStatusClass(weatherInfo?.windSpeedStatus)}`}>
+                <p>바람 {weatherInfo?.windSpeedStatus || "정보 없음"}</p>
+              </li>
+              <li className={`reh ${getStatusClass(weatherInfo?.humidityStatus)}`}>
+                <p>습도 {weatherInfo?.humidityStatus || "정보 없음"}</p>
+              </li>
+              <li className={`air ${getStatusClass(weatherInfo?.airQualityStatus)}`}>
+                <p>대기질 {weatherInfo?.airQualityStatus || "정보 없음"}</p>
+              </li>
+          </ul>
+        {/* <div>강수상태: {weatherInfo?.RN1 || "정보 없음"}</div>
+        <div>하늘상태: {weatherInfo?.SKY || "정보 없음"}</div>
+        <div>icon명: {weatherInfo?.weatherIcon || "정보 없음"}</div> */}
+      </section>
+      <section className='recommend_wrap'>
+        <div className='recommend_today'  onClick={() => navigate('/result_closet')}>
+          <h3>오늘의<br/>추천 코디</h3>
+          <span className='icon_wrap'></span>
+        </div>
+        <div className='recommend_write' onClick={() => navigate('/recommend')}>
+          <h3>오늘의<br/>체감 기록</h3>
+          <span className='icon_wrap'></span>
+        </div>
+      </section>
+      <section className='ad_zone'>
+        <div className='ad_banner'>
+          <img src={`${process.env.PUBLIC_URL}/images/musinsa_ad.png`} alt="ad" />
+        </div>
+      </section>
     </div>
   );
 }
