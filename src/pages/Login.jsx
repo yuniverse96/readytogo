@@ -54,7 +54,7 @@ function Login() {
       navigate('/home');
     } catch (error) {
       console.error("로그인 실패:", error.code, error.message);
-      let message = "로그인에 실패했습니다.";
+      let message = "로그인에 실패했습니다." + error.code;
 
       if (error.code === 'auth/wrong-password') {
         message = "비밀번호가 올바르지 않습니다.";
