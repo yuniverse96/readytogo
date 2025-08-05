@@ -18,7 +18,7 @@ function Main() {
   useAutoLogout();
 
 
-  const showHeaderPaths = ['/home', '/result_closet']; // Header 보여줄 경로 목록
+  const showHeaderPaths = ['/home', '/result_closet', '/login']; // Header 보여줄 경로 목록
   const shouldShowHeader = showHeaderPaths.includes(location.pathname);
 
 
