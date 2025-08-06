@@ -159,6 +159,7 @@ const handleSearchClick = async () => {
   };
 
 
+
   return (
     <div id='home'>      
        <section className='top_area'>
@@ -205,7 +206,7 @@ const handleSearchClick = async () => {
             </div>
 
             <div className='info_box'>
-              <h3>{weatherInfo?.T1H ? `${weatherInfo.T1H}°C` : "정보 없음"}</h3>
+              <h3>{weatherInfo?.T1H ? `${weatherInfo.T1H}°C` : "--ºC"}</h3>
               <p className='weather_txt'>
                 {weatherInfo
                   ? `${weatherInfo.weatherDescription}`
