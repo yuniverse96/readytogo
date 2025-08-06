@@ -151,6 +151,8 @@ function HomeMain() {
     }
   };
 
+  console.log(weatherInfo.weatherIcon);
+
   return (
     <div id='home'>      
        <section className='top_area'>
