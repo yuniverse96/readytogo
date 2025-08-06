@@ -131,4 +131,60 @@ export const getUltraShortTermForecast = async (nx, ny, base_date, base_time) =>
   }
 };
 
+// 3. 초단기실황 조회 함수 (지금 당장 날씨.)
+export const getNowTermForecast = async (nx, ny, base_date, base_time) => {
+  const serviceKey = process.env.REACT_APP_KMA_SERVICE_KEY;
+  const cacheKey = `shortWeather-${nx}-${ny}`;
+
+  try {
+    const response = await axios.get(
+      'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst',
+      {
+        params: {
+          serviceKey,
+          pageNo: '1',
+          numOfRows: '1000',
+          dataType: 'JSON',
+          base_date,
+          base_time,
+          nx,
+          ny,
+        },
+      }
+    );
+
+    const result = response.data.response;
+
+    if (result?.header.resultCode === '00' && result?.body?.items?.item?.length > 0) {
+      const items = result.body.items.item;
+
+      // 성공 시 로컬스토리지에 저장
+      const cacheData = {
+        items,
+        savedAt: new Date().toISOString(),
+        base_date,
+        base_time,
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+
+      return items;
+    } else {
+      throw new Error(result?.header?.resultMsg || '응답 없음');
+    }
+  } catch (error) {
+    console.error('초단기예보 API 요청 실패:', error.message);
+
+    // 로컬스토리지에서 저장된 데이터 불러오기
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      console.warn(`이전 캐시 데이터 사용됨 (${parsed.base_date} ${parsed.base_time})`);
+      return parsed.items;
+    }
+
+    // 캐시도 없으면 에러 던지기
+    throw new Error('API 실패 + 캐시 데이터 없음');
+  }
+};
+
 
