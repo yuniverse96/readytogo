@@ -158,7 +158,6 @@ const handleSearchClick = async () => {
     }
   };
 
-  console.log(weatherInfo.weatherIcon);
 
   return (
     <div id='home'>      
@@ -217,13 +216,13 @@ const handleSearchClick = async () => {
 
           <ul className='weather_condition'>
               <li className={`wind ${getStatusClass(weatherInfo?.windSpeedStatus)}`}>
-                <p>바람 {weatherInfo?.windSpeedStatus || "정보 없음"}</p>
+                <p>바람 {weatherInfo?.windSpeedStatus || "보통"}</p>
               </li>
               <li className={`reh ${getStatusClass(weatherInfo?.humidityStatus)}`}>
-                <p>습도 {weatherInfo?.humidityStatus || "정보 없음"}</p>
+                <p>습도 {weatherInfo?.humidityStatus || "보통"}</p>
               </li>
               <li className={`air ${getStatusClass(weatherInfo?.airQualityStatus)}`}>
-                <p>대기질 {weatherInfo?.airQualityStatus || "정보 없음"}</p>
+                <p>대기질 {weatherInfo?.airQualityStatus || "보통"}</p>
               </li>
           </ul>
         {/* <div>강수상태: {weatherInfo?.RN1 || "정보 없음"}</div>

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   getUltraShortTermForecast,
+  getNowTermForecast,
   convertGRID_GPS,
   getBaseDateTime,
 } from '../api/RealtimeWeatherApi';
@@ -14,7 +15,7 @@ const DEFAULT_COORDINATES = {
 };
 
 const getHumidityStatus = reh => {
-  if (reh === undefined) return '정보 없음';
+  if (reh === undefined) return '보통';
   if (reh >= 40 && reh <= 60) return '좋음';
   else if ((reh >= 30 && reh < 40) || (reh > 60 && reh <= 70)) return '보통';
   else if ((reh >= 20 && reh < 30) || (reh > 70 && reh <= 79)) return '나쁨';
@@ -22,7 +23,7 @@ const getHumidityStatus = reh => {
 };
 
 const getWindSpeedStatus = wsd => {
-  if (wsd === undefined) return '정보 없음';
+  if (wsd === undefined) return '보통';
   if (wsd >= 1 && wsd <= 3) return '좋음';
   else if (wsd >= 4 && wsd <= 5) return '보통';
   else if (wsd >= 6 && wsd <= 7) return '나쁨';
@@ -30,7 +31,7 @@ const getWindSpeedStatus = wsd => {
 };
 
 const getAirQualityStatus = pm10 => {
-  if (pm10 === undefined || pm10 === null || isNaN(Number(pm10))) return '정보 없음';
+  if (pm10 === undefined || pm10 === null || isNaN(Number(pm10))) return '보통';
   const value = Number(pm10);
   if (value <= 30) return '좋음';
   if (value <= 80) return '보통';
@@ -60,6 +61,18 @@ const WEATHER_DESCRIPTION_MAP = {
   'rain_snow_cloudy': '구름이 많고 비와 눈이 내려요.',
 };
 
+//초단기예보 sky정보
+const extractForecastSky = (forecastData) => {
+  if (!forecastData) return undefined;
+
+  const forecastMap = forecastData.reduce((acc, cur) => {
+    acc[cur.category] = cur.fcstValue;
+    return acc;
+  }, {});
+
+  return forecastMap.SKY;
+};
+
 const getWeatherIcon = (pty, sky) => {
   const icons = [];
   if (pty && pty !== '0') icons.push(PTY_ICON_MAP[pty] || 'unknown');
@@ -67,10 +80,11 @@ const getWeatherIcon = (pty, sky) => {
   return icons.join('_');
 };
 
-const buildWeatherInfo = (shortData, airData) => {
+//초단기실황 현재 모든 정보
+const buildWeatherInfo = (shortData, airData, skyValue) => {
   if (!shortData) return null;
   const weatherInfo = shortData.reduce((acc, cur) => {
-    acc[cur.category] = cur.fcstValue;
+    acc[cur.category] = cur.obsrValue;
     return acc;
   }, {});
 
@@ -87,10 +101,13 @@ const buildWeatherInfo = (shortData, airData) => {
   } else {
     weatherInfo.pm10 = null;
     weatherInfo.pm10Grade = null;
-    weatherInfo.airQualityStatus = '정보 없음';
+    weatherInfo.airQualityStatus = '보통';
   }
 
+  weatherInfo.SKY = skyValue;
+
   const icon = getWeatherIcon(weatherInfo.PTY, weatherInfo.SKY);
+
   weatherInfo.weatherIcon = icon;
   weatherInfo.weatherDescription = WEATHER_DESCRIPTION_MAP[icon] || '날씨 정보를 불러올 수 없어요';
   weatherInfo.weatherColor = SKY_ICON_MAP[weatherInfo.SKY] || 'default';
@@ -147,9 +164,28 @@ export const useShortWeather = (lat, lon, targetTime) => {
     return map[region1depth] || region1depth;
   };
 
-  const { base_date, base_time } = getBaseDateTime(targetTime);
+  const { base_date, base_time } = getBaseDateTime(new Date());
   const { nx, ny } = coordinates ? convertGRID_GPS(coordinates.lat, coordinates.lon) : { nx: null, ny: null };
+  
+  //초단기 실황
+  const {
+    data: nowWeatherData,
+    isLoading: nowWeatherLoading,
+    error: nowWeatherError,
+    refetch: refetchNowWeather,
+  } = useQuery({
+    queryKey: ['nowWeather', nx, ny, base_date, base_time],
+    queryFn: () => getNowTermForecast(nx, ny, base_date, base_time),
+    enabled: !!nx && !!ny,
+    staleTime: 1000 * 60 * 5,
+    cacheTime: 1000 * 60 * 60,
+    retry: 3,
+    retryDelay: attempt => Math.min(1000 * 2 ** attempt, 30000),
+  });
 
+
+
+  //초단기 예보
   const {
     data: shortWeatherData,
     isLoading: shortWeatherLoading,
@@ -187,7 +223,8 @@ export const useShortWeather = (lat, lon, targetTime) => {
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const weatherInfo = buildWeatherInfo(shortWeatherData, airData);
+  const sky = extractForecastSky(shortWeatherData); // 예보용 API
+  const weatherInfo = buildWeatherInfo(nowWeatherData, airData, sky);
 
 
   const defaultWeatherInfo = {
