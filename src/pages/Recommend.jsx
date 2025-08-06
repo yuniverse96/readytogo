@@ -2,6 +2,7 @@ import React, { useRef, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KakaoMapSearch from '../component/KakaoMap';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { serverTimestamp } from "firebase/firestore";
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
@@ -106,6 +107,7 @@ function Recommend() {
         uid: user.uid,
         email: user.email,
         date: dateStr,
+        time: serverTimestamp(),
       });
 
   
