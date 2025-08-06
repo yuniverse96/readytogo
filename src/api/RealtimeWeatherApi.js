@@ -78,7 +78,7 @@ export const getBaseDateTime = () => {
 // 3. 초단기예보 조회 함수 (단기예보 대신 이걸로 바꿔서 쓰면 됨)
 export const getUltraShortTermForecast = async (nx, ny, base_date, base_time) => {
   const serviceKey = process.env.REACT_APP_KMA_SERVICE_KEY;
-  const cacheKey = `shortWeather-${nx}-${ny}`;
+  const cacheKey = `forecast-ultra-${nx}-${ny}`;
 
   try {
     const response = await axios.get(
@@ -134,7 +134,7 @@ export const getUltraShortTermForecast = async (nx, ny, base_date, base_time) =>
 // 3. 초단기실황 조회 함수 (지금 당장 날씨.)
 export const getNowTermForecast = async (nx, ny, base_date, base_time) => {
   const serviceKey = process.env.REACT_APP_KMA_SERVICE_KEY;
-  const cacheKey = `shortWeather-${nx}-${ny}`;
+  const cacheKey = `forecast-now-${nx}-${ny}`;
 
   try {
     const response = await axios.get(

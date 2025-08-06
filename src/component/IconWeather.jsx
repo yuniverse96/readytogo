@@ -15,7 +15,7 @@ const IconWeather = ({ type }) => {
 
     gsap.killTweensOf(iconRef.current); // 이전 애니메이션 제거
     //맑음
-    if (type === 'sunny') {
+    if (type === 'sunny' || type === 'default') {
       const tl = gsap.timeline();
     
       tl.fromTo(
@@ -149,7 +149,8 @@ const IconWeather = ({ type }) => {
   }, [type]);
   const renderIcon = () => {
     switch (type) {
-      case 'sunny':
+       case 'sunny':
+        case 'default':
         return (
           <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
             <Sunnny />

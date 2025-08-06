@@ -44,6 +44,7 @@ const PTY_ICON_MAP = {
   '4': 'shower', '5': 'drizzle', '6': 'drizzle_snow', '7': 'snow_wind',
 };
 
+
 const SKY_ICON_MAP = {
   '1': 'sunny', '3': 'cloudy', '4': 'overcast',
 };
@@ -212,11 +213,12 @@ export const useShortWeather = (lat, lon, targetTime) => {
     queryKey: ['airQuality', localArea],
     queryFn: async () => {
       const result = await getAirQuality(localArea);
-      if (!result) {
-        const cached = localStorage.getItem(`airQuality-${localArea}`);
-        return cached ? JSON.parse(cached) : null;
+      if (result) {
+        localStorage.setItem(`airQuality-${localArea}`, JSON.stringify(result));
+        return result;
       }
-      return result;
+      const cached = localStorage.getItem(`airQuality-${localArea}`);
+      return cached ? JSON.parse(cached) : null;
     },
     staleTime: 1000 * 60 * 60,
     retry: 1,
@@ -228,7 +230,7 @@ export const useShortWeather = (lat, lon, targetTime) => {
 
 
   const defaultWeatherInfo = {
-    T1H: '--',
+    T1H: '--ºC',
     weatherDescription: '날씨 정보 불러오는중...',
     weatherIcon: 'sunny',
     weatherColor: 'default',
