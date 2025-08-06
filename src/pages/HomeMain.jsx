@@ -3,7 +3,7 @@ import { useContext, useEffect, useState,useRef } from 'react';
 import { gsap } from 'gsap';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, orderBy, limit, getDocs, getFirestore, doc, getDoc } from "firebase/firestore";
 import { AuthContext } from '../AuthContext';
 import useUserId from '../hooks/useUserId';
 import { useWeather } from '../hooks/useWeather';
@@ -82,39 +82,46 @@ function HomeMain() {
     refetch(); // 데이터 재요청
   };
 
-  const handleSearchClick = async () => {
-    if (!userId) {
-      // userId가 없으면 바로 recommend로 보내거나, 로그인 필요 알림 가능
-      alert("로그인 후 이용가능합니다")
-      navigate('/login');
-      return;
-    }
-    
-    const db = getFirestore();
-    const uid = user?.uid; 
-    const today = new Date().toISOString().slice(0, 10); // yyyy-mm-dd
-    const docId = `${uid}_${today}`;
-    console.log(docId);
-    const docRef = doc(db, "recommendations", docId);
 
-    try {
-      console.log('조회할 docId:', docId);
-      const docSnap = await getDoc(docRef);
-      console.log('docSnap.exists():', docSnap.exists());
-      console.log('docSnap.data():', docSnap.data());
-    
-      if (docSnap.exists()) {
-        navigate('/spotarea');
-      } else {
-        alert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주시면 도와드릴게요.");
-        navigate('/recommend');
-      }
-    } catch (error) {
-      alert("정보 조회 중 에러가 발생했습니다.");
-      console.error("Firestore 문서 조회 에러:", error);
+const handleSearchClick = async () => {
+  if (!userId || !user?.uid) {
+    alert("로그인 후 이용해주세요!");
+    navigate('/login');
+    return;
+  }
+
+  const db = getFirestore();
+  const uid = user.uid;
+
+  try {
+    // recommendations 컬렉션에서 uid가 일치하는 문서 중 최신 날짜순 정렬
+    const q = query(
+      collection(db, "recommendations"),
+      where("uid", "==", user.uid),
+      orderBy("time", "desc"),  // 문서 안에 date 필드가 있어야 해 (예: 2025-08-06)
+      limit(1)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const latestDoc = querySnapshot.docs[0];
+      console.log("최신 문서 ID:", latestDoc.id);
+      console.log("최신 문서 데이터:", latestDoc.data());
+
+      navigate('/spotarea');
+    } else {
+      alert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주시면 도와드릴게요.");
       navigate('/recommend');
     }
-  };
+
+  } catch (error) {
+    alert("정보 조회 중 에러가 발생했습니다.");
+    console.error("Firestore 문서 조회 에러:", error);
+    navigate('/recommend');
+  }
+};
+
 
   //업데이트 상태
   const getTimeSinceRefresh = (time) => {
