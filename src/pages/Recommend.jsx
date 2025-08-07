@@ -40,6 +40,7 @@ function Recommend() {
     constitution:'',
     season: '',
     temperature: '',
+    condition : '',
     topWear: [],
     topInner: [],
     bottomWear: [],
@@ -311,16 +312,16 @@ function Recommend() {
                         /> 
                         <label htmlFor="NHC">둘 다 많이 안 탐</label>
                     </li>
-                   
                 </ul>
             </div>
           </SwiperSlide>
             {/* 계절 온도 */}
           <SwiperSlide>
-            <div className='form_select'>
+            <div className='form_select scc'>
                 <div className='top_title'>
-                   현재 기온을 알려주세요.
+                   현재 기온과 체감도를 알려주세요.
                 </div>
+                <h4>지금 계절은?</h4>
                 <ul className='season'>
                     <li>
                         <input 
@@ -421,6 +422,69 @@ function Recommend() {
                     </div>
                    
                 </div>
+
+                <div className='now_condition'>
+                    <h4>지금의 온도가 나에게는?</h4>
+                    <ul>
+                      <li>
+                          <input
+                              type="radio"
+                              id="sohot"
+                              name="sohot"
+                              value="sohot"
+                              checked={formData.condition === 'sohot'}
+                              onChange={() => handleChange('condition', 'sohot')}
+                          />
+                          <label htmlFor="sohot">너무 더움</label>
+                      </li>
+                      <li>
+                          <input
+                              type="radio"
+                              id="hot"
+                              name="hot"
+                              value="hot"
+                              checked={formData.condition === 'hot'}
+                              onChange={() => handleChange('condition', 'hot')}
+                          />
+                          <label htmlFor="hot">조금 더움</label>
+                      </li>
+                      <li>
+                          <input
+                              type="radio"
+                              id="normal"
+                              name="normal"
+                              value="normal"
+                              checked={formData.condition === 'normal'}
+                              onChange={() => handleChange('condition', 'normal')}
+                          />
+                          <label htmlFor="normal">보통</label>
+                      </li>
+                      <li>
+                          <input
+                              type="radio"
+                              id="cold"
+                              name="cold"
+                              value="cold"
+                              checked={formData.condition === 'cold'}
+                              onChange={() => handleChange('condition', 'cold')}
+                          />
+                          <label htmlFor="cold">조금 추움</label>
+                      </li>
+                      <li>
+                          <input
+                              type="radio"
+                              id="socold"
+                              name="socold"
+                              value="socold"
+                              checked={formData.condition === 'socold'}
+                              onChange={() => handleChange('condition', 'socold')}
+                          />
+                          <label htmlFor="socold">너무 추움</label>
+                      </li>
+                    </ul>
+                </div>
+
+                      
             </div>
           </SwiperSlide>
             {/* 상의 정보*/}

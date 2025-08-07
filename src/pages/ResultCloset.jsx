@@ -124,7 +124,7 @@ export default function ResultCloset() {
             onChange={(e) => setInputTime(e.target.value)}
             placeholder="시간 입력 (예: 15시, 오전 7시, 오후 7시)"
             maxLength={7}
-            showLabel="inline"
+            showLabel="top"
             style={{ padding: 8, fontSize: 16, marginBottom: 12 }}
             />
 
