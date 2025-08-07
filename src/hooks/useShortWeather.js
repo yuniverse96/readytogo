@@ -270,7 +270,7 @@ export const useShortWeather = (lat, lon, targetTime) => {
 
 
   const defaultWeatherInfo = {
-    T1H: '--ºC',
+    T1H: '--',
     weatherDescription: '날씨 정보 불러오는중...',
     weatherIcon: 'sunny',
     weatherColor: 'default',

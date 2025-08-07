@@ -14,7 +14,7 @@
 #menu_pop.on { opacity: 1;pointer-events: auto;}
 #menu_pop .menu_card {width: 51%; display: flex; flex-direction: column; min-height: 50%; background-color: #fff; position: absolute; top: 15px; right: -100vw; padding: 20px; border-radius: 10px 0px 0px 10px; transition: right 0.2s cubic-bezier(.56,.05,.52,1.05); }
 #menu_pop.on .menu_card {right: 0;}
-#menu_pop .menu_card .close_btn {width: 15px; height: 15px; overflow: hidden; text-indent: 999px; background:url(../../public/images/card_close.png) no-repeat center center / cover}
+#menu_pop .menu_card .close_btn {width: 15px; height: 15px; overflow: hidden; text-indent: 999px; background:url(../../public/images/card_close.png) no-repeat center center / contain}
 #menu_pop .menu_card .user_wrap {width: 100%; margin-top: 45px; }
 #menu_pop .menu_card .user_wrap .top_name {width: 100%; display: flex; flex-wrap: wrap; gap: 11px; align-items: center;}
 #menu_pop .menu_card .user_wrap .top_name .img_wrap {width: 44px; height: 44px; overflow: hidden; border-radius: 44px;}
@@ -24,10 +24,10 @@
 #menu_pop .menu_card .user_wrap ul {margin-bottom: 30px; border-bottom: 1px solid #ececec;width: 100%; margin-top: 32px; display: flex; flex-direction: column;}
 #menu_pop .menu_card .user_wrap ul li {border-top: 1px solid #ececec; width: 100%; padding: 18px 11px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;}
 #menu_pop .menu_card .user_wrap ul li::before {content: ""; display: block; width: 14px; height: 14px;}
-#menu_pop .menu_card .user_wrap ul .my::before{background:url(../../public/images/my.png) no-repeat center center / cover;}
-#menu_pop .menu_card .user_wrap ul .before::before{background:url(../../public/images/before_list.png) no-repeat center center / cover;}
-#menu_pop .menu_card .user_wrap ul .messege::before{background:url(../../public/images/messege.png) no-repeat center center / cover;}
-#menu_pop .menu_card .user_wrap ul .qna::before{background:url(../../public/images/qna.png) no-repeat center center / cover;}
+#menu_pop .menu_card .user_wrap ul .my::before{background:url(../../public/images/my.png) no-repeat center center / 14px;}
+#menu_pop .menu_card .user_wrap ul .before::before{background:url(../../public/images/before_list.png) no-repeat center center / 14px;}
+#menu_pop .menu_card .user_wrap ul .messege::before{background:url(../../public/images/messege.png) no-repeat center center / 14px;}
+#menu_pop .menu_card .user_wrap ul .qna::before{background:url(../../public/images/qna.png) no-repeat center center / 14px;}
 #menu_pop .menu_card .user_wrap ul li p {width: 10px; flex: 1 1 50%; color: #00242E; font-size: 12px; font-weight: 500; }
 
 

@@ -36,7 +36,7 @@ function Header() {
       <>
           <div id="header">
               <div className="logo" onClick={() => navigate('/home')}>
-                  <img src={`${process.env.PUBLIC_URL}/images/h_logo.png`} alt="logo" />
+                  <img src={`${process.env.PUBLIC_URL}/images/logo_home.png`} alt="logo" />
               </div>
               <div className='btn_all'>
                   <button type='button' className='ring'>알림</button>

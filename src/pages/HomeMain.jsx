@@ -98,16 +98,25 @@ const handleSearchClick = async () => {
     const q = query(
       collection(db, "recommendations"),
       where("uid", "==", user.uid),
-      orderBy("time", "desc"),  // 문서 안에 date 필드가 있어야 해 (예: 2025-08-06)
+      orderBy("time", "desc"), 
       limit(1)
     );
 
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
-      const latestDoc = querySnapshot.docs[0];
-      console.log("최신 문서 ID:", latestDoc.id);
-      console.log("최신 문서 데이터:", latestDoc.data());
+      const docData = querySnapshot.docs[0].data();
+      const lastTime = docData.time.toDate(); // Firestore Timestamp → JS Date
+      const today = new Date();
+
+        // 날짜 차이 계산 (밀리초 → 일 단위 변환)
+        const diffDays = Math.floor((today - lastTime) / (1000 * 60 * 60 * 24));
+   
+        //최신문서 7일 이상 차이날때 재입력 페이지로 넘어감.
+        if (diffDays > 7) {
+          alert("입력했던 정보가 너무 오래됐어요 재입력해주세요!");
+          navigate("/recommend");
+        }
 
       navigate('/spotarea');
     } else {
