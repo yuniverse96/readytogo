@@ -149,7 +149,7 @@ const IconWeather = ({ type }) => {
   }, [type]);
   const renderIcon = () => {
     switch (type) {
-       case 'sunny':
+        case 'sunny':
         case 'default':
         return (
           <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
