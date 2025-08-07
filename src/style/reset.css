@@ -94,3 +94,6 @@ table {
   border-spacing: 0;
 }
 ::-webkit-scrollbar {display: none;}
+
+img{   image-rendering: -webkit-optimize-contrast; /* 크롬 */
+  image-rendering: crisp-edges; /* 파폭 등 */}
