@@ -40,27 +40,56 @@ const getAirQualityStatus = pm10 => {
 };
 
 const PTY_ICON_MAP = {
-  '0': 'clear', '1': 'rain', '2': 'rain_snow', '3': 'snow',
+  '0': 'sunny', '1': 'rain', '2': 'rain_snow', '3': 'snow',
   '4': 'shower', '5': 'drizzle', '6': 'drizzle_snow', '7': 'snow_wind',
 };
 
-
 const SKY_ICON_MAP = {
-  '1': 'sunny', '3': 'cloudy', '4': 'overcast',
+  '1': 'clear', '3': 'cloudy', '4': 'overcast',
 };
 
 const WEATHER_DESCRIPTION_MAP = {
+  // PTY가 1 (비)
   'rain_overcast': '하늘이 흐리고 비가 내려요.',
-  'rain_cloudy': '구름이 많고, 비가내려요.',
-  'rain_sunny': '비가 와요.',
-  'snow_cloudy': '구름이 많고, 눈이와요.',
-  'rain': '비가 내려요.',
-  'snow': '눈이 와요.',
+  'rain_cloudy': '구름이 많고 비가 내려요.',
+  'rain_sunny': '비가 내려요.',
+
+  // PTY가 2 (비/눈)
+  'rain_snow_overcast': '하늘이 흐리고 비와 눈이 내려요.',
+  'rain_snow_cloudy': '구름이 많고 비와 눈이 내려요.',
+  'rain_snow_sunny': '비와 눈이 내려요.',
+
+  // PTY가 3 (눈)
+  'snow_overcast': '하늘이 흐리고 눈이 내려요.',
+  'snow_cloudy': '구름이 많고 눈이 내려요.',
+  'snow_sunny': '눈이 내려요.',
+
+  // PTY가 4 (소나기)
+  'shower_overcast': '하늘이 흐리고 소나기가 내려요.',
+  'shower_cloudy': '구름이 많고 소나기가 내려요.',
+  'shower_sunny': '소나기가 내려요.',
+
+  // PTY가 5 (빗방울)
+  'drizzle_overcast': '하늘이 흐리고 빗방울이 떨어져요.',
+  'drizzle_cloudy': '구름이 많고 빗방울이 떨어져요.',
+  'drizzle_sunny': '빗방울이 떨어져요.',
+
+  // PTY가 6 (빗방울 + 눈날림)
+  'drizzle_snow_overcast': '하늘이 흐리고 빗방울과 눈이 날려요.',
+  'drizzle_snow_cloudy': '구름이 많고 빗방울과 눈이 날려요.',
+  'drizzle_snow_sunny': '빗방울과 눈이 날려요.',
+
+  // PTY가 7 (눈날림)
+  'snow_wind_overcast': '하늘이 흐리고 눈이 날려요.',
+  'snow_wind_cloudy': '구름이 많고 눈이 날려요.',
+  'snow_wind_sunny': '눈이 날려요.',
+
+  // PTY가 0 (강수 없음) → SKY만 봐야 함
   'overcast': '하늘이 흐려요.',
   'cloudy': '구름이 많아요.',
   'sunny': '맑은 날씨예요.',
-  'rain_snow_cloudy': '구름이 많고 비와 눈이 내려요.',
 };
+
 
 //초단기예보 sky정보
 const extractForecastSky = (forecastData) => {
@@ -75,10 +104,17 @@ const extractForecastSky = (forecastData) => {
 };
 
 const getWeatherIcon = (pty, sky) => {
-  const icons = [];
-  if (pty && pty !== '0') icons.push(PTY_ICON_MAP[pty] || 'unknown');
-  if (sky) icons.push(SKY_ICON_MAP[sky] || 'unknown');
-  return icons.join('_');
+  const ptyClass = PTY_ICON_MAP[pty]; // ex. 'rain', 'sunny'
+  const skyClass = SKY_ICON_MAP[sky]; // ex. 'cloudy', 'clear'
+
+  if (!ptyClass) return '';
+
+  // sky가 clear거나 undefined/null일 때는 sky 생략
+  if (!skyClass || skyClass === 'clear') {
+    return ptyClass;
+  }
+
+  return `${skyClass}_${ptyClass}`;
 };
 
 //초단기실황 현재 모든 정보
@@ -112,7 +148,7 @@ const buildWeatherInfo = (shortData, airData, skyValue) => {
   weatherInfo.weatherIcon = icon;
   weatherInfo.weatherDescription = WEATHER_DESCRIPTION_MAP[icon] || '날씨 정보를 불러올 수 없어요';
   weatherInfo.weatherColor = SKY_ICON_MAP[weatherInfo.SKY] || 'default';
-
+ 
   return weatherInfo;
 };
 

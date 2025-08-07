@@ -199,9 +199,9 @@ const handleSearchClick = async () => {
               </p>
             </div>
 
-            <div className='icon_box'>
+            <div className={`icon_box ${weatherInfo.weatherIcon}`}>
               {weatherInfo
-                ? <IconWeather type={weatherInfo.weatherIcon} />
+                ? <IconWeather type={weatherInfo.weatherIcon}  />
                 : <div className="placeholder-icon"></div>}
             </div>
 

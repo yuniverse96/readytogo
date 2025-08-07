@@ -82,7 +82,7 @@ const IconWeather = ({ type }) => {
         repeat: -1,
       });
     }
-     else if (type === 'rain' || type === 'rain_overcast' || type === 'rain_cloudy')  {
+     else if (type === 'rain' || type === 'rain_overcast' || type === 'rain_cloudy' || type === 'rain_sunny' )  {
 
       const cloud = iconRef.current.querySelector('.cloud');
       const drops = iconRef.current.querySelectorAll('.drop'); 
