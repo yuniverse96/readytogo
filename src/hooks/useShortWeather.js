@@ -87,7 +87,7 @@ const WEATHER_DESCRIPTION_MAP = {
   // PTY가 0 (강수 없음) → SKY만 봐야 함
   'overcast': '하늘이 흐려요.',
   'cloudy': '구름이 많아요.',
-  'sunny': '맑은 날씨예요.',
+  'clear': '맑은 날씨예요.',
 };
 
 
@@ -104,18 +104,22 @@ const extractForecastSky = (forecastData) => {
 };
 
 const getWeatherIcon = (pty, sky) => {
-  const ptyClass = PTY_ICON_MAP[pty]; // ex. 'rain', 'sunny'
-  const skyClass = SKY_ICON_MAP[sky]; // ex. 'cloudy', 'clear'
+  // PTY가 '0'이면 강수 없음으로 간주
+  if (pty === '0' || !PTY_ICON_MAP[pty]) {
+    return SKY_ICON_MAP[sky] || 'default';
+  }
 
-  if (!ptyClass) return '';
+  const ptyClass = PTY_ICON_MAP[pty]; // rain, snow 등
+  const skyClass = SKY_ICON_MAP[sky]; // cloudy, overcast 등
 
-  // sky가 clear거나 undefined/null일 때는 sky 생략
   if (!skyClass || skyClass === 'clear') {
     return ptyClass;
   }
 
-  return `${skyClass}_${ptyClass}`;
+  return `${ptyClass}_${skyClass}`;
 };
+
+
 
 //초단기실황 현재 모든 정보
 const buildWeatherInfo = (shortData, airData, skyValue) => {
