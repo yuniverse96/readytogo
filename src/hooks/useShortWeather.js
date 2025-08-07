@@ -40,12 +40,12 @@ const getAirQualityStatus = pm10 => {
 };
 
 const PTY_ICON_MAP = {
-  '0': 'sunny', '1': 'rain', '2': 'rain_snow', '3': 'snow',
+  '0': 'clear', '1': 'rain', '2': 'rain_snow', '3': 'snow',
   '4': 'shower', '5': 'drizzle', '6': 'drizzle_snow', '7': 'snow_wind',
 };
 
 const SKY_ICON_MAP = {
-  '1': 'clear', '3': 'cloudy', '4': 'overcast',
+  '1': 'sunny', '3': 'cloudy', '4': 'overcast',
 };
 
 const WEATHER_DESCRIPTION_MAP = {
@@ -87,7 +87,7 @@ const WEATHER_DESCRIPTION_MAP = {
   // PTY가 0 (강수 없음) → SKY만 봐야 함
   'overcast': '하늘이 흐려요.',
   'cloudy': '구름이 많아요.',
-  'clear': '맑은 날씨예요.',
+  'sunny': '맑은 날씨예요.',
 };
 
 

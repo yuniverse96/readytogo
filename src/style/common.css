@@ -12,7 +12,7 @@
 
 #menu_pop {width: 100vw; height: 100vh; max-width: 500px; overflow: hidden; position: fixed; z-index: 999; top: 0; left: 50%; transform: translate(-50%,0); background-color: rgba(0, 0, 0, 0.40);  opacity: 0; pointer-events: none;transition: opacity 0.2s cubic-bezier(.56,.05,.52,1.05);}
 #menu_pop.on { opacity: 1;pointer-events: auto;}
-#menu_pop .menu_card {width: 51%; display: flex; flex-direction: column; min-height: 50%; background-color: #fff; position: absolute; top: 15px; right: -100vw; padding: 20px; border-radius: 10px 0px 0px 10px; transition: all 0.2s cubic-bezier(.56,.05,.52,1.05); }
+#menu_pop .menu_card {width: 51%; display: flex; flex-direction: column; min-height: 50%; background-color: #fff; position: absolute; top: 15px; right: -100vw; padding: 20px; border-radius: 10px 0px 0px 10px; transition: right 0.2s cubic-bezier(.56,.05,.52,1.05); }
 #menu_pop.on .menu_card {right: 0;}
 #menu_pop .menu_card .close_btn {width: 15px; height: 15px; overflow: hidden; text-indent: 999px; background:url(../../public/images/card_close.png) no-repeat center center / cover}
 #menu_pop .menu_card .user_wrap {width: 100%; margin-top: 45px; }

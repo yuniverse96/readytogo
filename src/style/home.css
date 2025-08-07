@@ -9,7 +9,7 @@
 
 #home .weather_wrap {width: 100%; display: flex; flex-direction: column; gap: 15px;}
 #home .weather_wrap .weather_big {width: 100%; padding: 20px;  background-color: #00bff9; border-radius: 20px; overflow: hidden;}
-#home .weather_wrap .weather_big.clear {background-color: #00bff9;} 
+#home .weather_wrap .weather_big.sunny {background-color: #00bff9;} 
 #home .weather_wrap .weather_big.cloudy{background-color: #97bdc8;} 
 #home .weather_wrap .weather_big.overcast {background-color: #83979d;} 
 
