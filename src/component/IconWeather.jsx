@@ -172,6 +172,7 @@ const IconWeather = ({ type }) => {
       case 'rain':
       case 'rain_overcast':
       case 'rain_cloudy':
+      case 'rain_sunny':
       return (
         <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
           <Rainy/>
