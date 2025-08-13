@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-  getUltraShortTermForecast,
+  getShortTermForecast,
   getNowTermForecast,
   convertGRID_GPS,
   getBaseDateTime,
@@ -235,7 +235,7 @@ export const useShortWeather = (lat, lon, targetTime) => {
     dataUpdatedAt: shortWeatherUpdatedAt,
   } = useQuery({
     queryKey: ['shortWeather', nx, ny, base_date, base_time],
-    queryFn: () => getUltraShortTermForecast(nx, ny, base_date, base_time),
+    queryFn: () => getShortTermForecast(nx, ny, base_date, base_time),
     enabled: !!nx && !!ny,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 60,

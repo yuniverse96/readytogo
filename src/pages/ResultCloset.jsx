@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { convertGRID_GPS, getBaseDateTime, getShortTermForecast } from '../api/WeatherApi';
-import AuthInput from '../component/AuthInput';
-import Header from '../component/Header';
-import '../style/resultCloset.css'
+import '../style/resultCloset.css';
 
 // 체질 보정값
 const constitutionAdjust = {
@@ -50,32 +49,51 @@ function getClothesRecommendation(feelTemp) {
   return '패딩, 두꺼운 코트, 목도리';
 }
 
+// 보간 함수
+function interpolateTemperature(data, targetDate, targetTime) {
+  const temps = data
+    .filter(item => item.category === 'TMP' && item.fcstDate === targetDate)
+    .sort((a, b) => Number(a.fcstTime) - Number(b.fcstTime));
+
+  if (temps.length === 0) return null;
+
+  const targetMinutes = Number(targetTime.slice(0, 2)) * 60 + Number(targetTime.slice(2));
+
+  let before = null;
+  let after = null;
+
+  for (let i = 0; i < temps.length; i++) {
+    const fcstMinutes = Number(temps[i].fcstTime.slice(0, 2)) * 60 + Number(temps[i].fcstTime.slice(2));
+    if (fcstMinutes <= targetMinutes) before = temps[i];
+    if (fcstMinutes >= targetMinutes) {
+      after = temps[i];
+      break;
+    }
+  }
+
+  if (!before) return Number(after.fcstValue);
+  if (!after) return Number(before.fcstValue);
+  if (before.fcstTime === after.fcstTime) return Number(before.fcstValue);
+
+  const beforeMinutes = Number(before.fcstTime.slice(0, 2)) * 60 + Number(before.fcstTime.slice(2));
+  const afterMinutes = Number(after.fcstTime.slice(0, 2)) * 60 + Number(after.fcstTime.slice(2));
+  const ratio = (targetMinutes - beforeMinutes) / (afterMinutes - beforeMinutes);
+
+  return Number(before.fcstValue) + ratio * (Number(after.fcstValue) - Number(before.fcstValue));
+}
+
 export default function ResultCloset() {
   const [nearestRec, setNearestRec] = useState(null);
   const [shortTermData, setShortTermData] = useState(null);
-  const [inputTime, setInputTime] = useState('');
   const user = auth.currentUser;
-
-  // 시간 문자열 → 24시 기반 변환
-  const parseKoreanHour = (input) => {
-    const ampmMatch = input.match(/^(오전|오후)?\s*(\d{1,2})시$/);
-    if (!ampmMatch) return null;
-    let hour = Number(ampmMatch[2]);
-    const ampm = ampmMatch[1];
-    if (ampm === '오후' && hour < 12) hour += 12;
-    if (ampm === '오전' && hour === 12) hour = 0;
-    return String(hour).padStart(2, '0') + '00';
-  };
+  const navigate = useNavigate();
 
   // 가장 가까운 추천 문서 가져오기
   useEffect(() => {
     if (!user) return;
     const fetchNearestRecommendation = async () => {
       try {
-        const q = query(
-          collection(db, 'recommendations'),
-          where('uid', '==', user.uid)
-        );
+        const q = query(collection(db, 'recommendations'), where('uid', '==', user.uid));
         const snapshot = await getDocs(q);
         if (snapshot.empty) {
           setNearestRec(null);
@@ -83,9 +101,7 @@ export default function ResultCloset() {
         }
 
         const today = new Date();
-        const todayNum = Number(
-          `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`
-        );
+        const todayNum = Number(`${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`);
         const diff = (dateStr) => Math.abs(Number(dateStr.replace(/-/g, '')) - todayNum);
 
         let closestDoc = null;
@@ -108,78 +124,65 @@ export default function ResultCloset() {
     fetchNearestRecommendation();
   }, [user]);
 
+  // meetingTime 없으면 /spotarea로 이동
+  useEffect(() => {
+    if (nearestRec && !nearestRec.meetingTime) {
+      navigate('/spotarea');
+    }
+  }, [nearestRec, navigate]);
+
+  // HHMM → "16:10"
+  const formatMeetingTime = (timeStr) => {
+    if (!timeStr || timeStr.length !== 4) return timeStr;
+    const hour = timeStr.slice(0, 2);
+    const min = timeStr.slice(2, 4);
+    return `${hour}:${min}`;
+  };
+
   // 날씨 데이터 가져오기
   useEffect(() => {
     if (!nearestRec?.coordinates) return;
     const { lat, lng } = nearestRec.coordinates;
     const { nx, ny } = convertGRID_GPS(Number(lat), Number(lng));
     const { base_date, base_time } = getBaseDateTime();
+
     getShortTermForecast(nx, ny, base_date, base_time)
-      .then(data => setShortTermData(data))
+      .then(data => {
+        setShortTermData(data);
+      })
       .catch(err => console.error('단기예보 API 호출 실패:', err));
   }, [nearestRec]);
 
-  // 오늘 날짜
   const today = new Date();
   const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
 
-  // 입력 시간 변환
-  const convertedTime = parseKoreanHour(inputTime);
-
-  // 해당 시간 기온 필터링
-  const filteredTemps = shortTermData && convertedTime
-    ? shortTermData.filter(
-        item => item.category === 'TMP' && item.fcstDate === todayStr && item.fcstTime === convertedTime
-      )
-    : [];
-
-  if (!user) return <p>로그인 후 이용해주세요.</p>;
-  if (!nearestRec) return <p>추천 문서가 없습니다.</p>;
+  const interpolatedTemp = shortTermData
+    ? interpolateTemperature(shortTermData, todayStr, nearestRec?.meetingTime || "0000")
+    : null;
 
   return (
     <div id='result_closet'>
       <h2>오늘과 가장 가까운 기록 문서 기준.</h2>
-      {/* <pre>{JSON.stringify(nearestRec, null, 2)}</pre> */}
       <br/>
       <h3>단기예보 데이터</h3>
-      <p>과거의 시간은 입력 불가합니다.</p>
-      {shortTermData ? (
-        <>
-          <AuthInput
-            type="text"
-            name="meetingTime"
-            value={inputTime}
-            onChange={(e) => setInputTime(e.target.value)}
-            placeholder="시간 입력 (예: 15시, 오전 7시, 오후 7시)"
-            maxLength={7}
-            showLabel="top"
-            style={{ padding: 8, fontSize: 16, marginBottom: 12 }}
-          />
+      <p>약속시간은 {nearestRec?.meetingTime ? formatMeetingTime(nearestRec.meetingTime) : '정보 없음'} 입니다.</p>
 
-          {filteredTemps.length > 0 ? (
-            filteredTemps.map((temp) => {
-              const feelTemp = calcFeelTemp(
-                Number(temp.fcstValue),
-                nearestRec.constitution,
-                nearestRec.condition
-              );
-              const status = getTempStatus(feelTemp);
-              const recommendation = getClothesRecommendation(feelTemp);
+      {interpolatedTemp !== null ? (
+        (() => {
+          const feelTemp = calcFeelTemp(interpolatedTemp, nearestRec.constitution, nearestRec.condition);
+          const status = getTempStatus(feelTemp);
+          const recommendation = getClothesRecommendation(feelTemp);
 
-              return (
-                <div key={`${temp.fcstDate}-${temp.fcstTime}`} style={{ marginBottom: '12px' }}>
-                  <div>예보 기온: {temp.fcstValue}°C</div>
-                  <div>체감온도: {feelTemp.toFixed(1)}°C → {status}</div>
-                  <div>추천 옷차림: {recommendation}</div>
-                </div>
-              );
-            })
-          ) : (
-            <p>해당 시간에 대한 기온 정보가 없습니다.</p>
-          )}
-        </>
+          return (
+            <div>
+              <div>보간 기온: {interpolatedTemp.toFixed(1)}°C</div>
+              <div>체감온도: {feelTemp.toFixed(1)}°C → {status}</div>
+              <div>추천 옷차림: {recommendation}</div>
+            </div>
+          );
+        })()
       ) : (
-        <p>단기예보를 불러오는 중입니다...</p>
+        <p>해당 시간에 대한 기온 정보가 없습니다.</p>
       )}
     </div>
   );

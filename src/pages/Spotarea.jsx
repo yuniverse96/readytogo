@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, {  useRef, useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   collection, query, where, orderBy, limit, getDocs, 
@@ -8,6 +8,7 @@ import { db } from '../firebase';
 import { AuthContext } from '../AuthContext';
 import KakaoMapSearch from '../component/KakaoMap';
 import useSearchStore from '../store/useSearchStore';
+import { gsap } from 'gsap';
 import '../style/recommend.css';
 
 function SpotArea() {
@@ -19,6 +20,52 @@ function SpotArea() {
   const [loading, setLoading] = useState(true);
   const [isPlaceSelected, setIsPlaceSelected] = useState(false);
   const setAddress = useSearchStore(state => state.setAddress);
+  const [meetingTime, setMeetingTime] = useState('');
+  const [selectedHour, setSelectedHour] = useState('');
+  const [selectedMinute, setSelectedMinute] = useState('');
+
+
+  //현재 시간 반환
+  const now = new Date();
+  let currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  
+  // 현재 시각 이후의 시간만 선택
+  if (currentMinute >= 50) {
+    currentHour += 1; // 50분 이상이면 다음 시간부터
+  }
+  
+  const hours = Array.from({ length: 24 - currentHour }, (_, i) => (currentHour + i).toString().padStart(2, '0'));
+  
+  // 분 배열
+  const allMinutes = ['00', '10', '20', '30', '40', '50'];
+  
+  // 선택 가능한 분
+  function getAvailableMinutes(hour) {
+    if (parseInt(hour) === now.getHours()) {
+      return allMinutes.filter(min => parseInt(min) > currentMinute);
+    }
+    return allMinutes;
+  }
+  
+
+  const handleHourSelect = (hour) => {
+    setSelectedHour(hour);
+    setFormData(prev => ({
+      ...prev,
+      meetingTime: `${hour}:${selectedMinute || '00'}`,
+    }));
+  };
+  
+  const handleMinuteSelect = (minute) => {
+    setSelectedMinute(minute);
+    setFormData(prev => ({
+      ...prev,
+      meetingTime: `${selectedHour || '00'}${minute}`,
+    }));
+  };
+  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,6 +110,7 @@ function SpotArea() {
       ...prev,
       coordinates: { lat, lng },
       meetingPlace: placeName,
+      meetingTime: meetingTime,
     }));
     setIsPlaceSelected(selected);
   };
@@ -94,6 +142,7 @@ function SpotArea() {
       setFormData({
         meetingPlace: '',
         coordinates: { lat: null, lng: null },
+        meetingTime: '',
       });
       setIsPlaceSelected(false);
     } catch (error) {
@@ -129,6 +178,32 @@ function SpotArea() {
         </div>
         <form onSubmit={handleSubmit} id="recommendForm">
           <KakaoMapSearch onSelectCoordinate={handleCoordinateSelect} />
+
+        <div className='time_picker'>
+          <ul className="hour_list">
+              {hours.map(h => (
+                <li
+                  key={h}
+                  className={selectedHour === h ? 'selected' : ''}
+                  onClick={() => handleHourSelect(h)}
+                >
+                  {h}시
+                </li>
+              ))}
+          </ul>
+          <ul className="minute_list">
+            {getAvailableMinutes(selectedHour).map(m => (
+              <li
+                key={m}
+                className={selectedMinute === m ? 'selected' : ''}
+                onClick={() => handleMinuteSelect(m)}
+              >
+                {m}분
+              </li>
+            ))}
+          </ul>
+        </div>
+
           <div className='submit_btn'>
             <button type="submit" disabled={!isPlaceSelected}>추천받기</button>
           </div>

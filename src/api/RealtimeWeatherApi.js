@@ -76,7 +76,7 @@ export const getBaseDateTime = () => {
 };
 
 // 3. 초단기예보 조회 함수 (단기예보 대신 이걸로 바꿔서 쓰면 됨)
-export const getUltraShortTermForecast = async (nx, ny, base_date, base_time) => {
+export const getShortTermForecast = async (nx, ny, base_date, base_time) => {
   const serviceKey = process.env.REACT_APP_KMA_SERVICE_KEY;
   const cacheKey = `forecast-ultra-${nx}-${ny}`;
 
