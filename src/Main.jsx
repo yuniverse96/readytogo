@@ -27,7 +27,7 @@ function Main() {
         {shouldShowHeader && <Header />}
           <Routes>
             <Route path="/" element={<Intro />} />
-            <Route path='/home' element={<Home />}></Route>
+            <Route path='/home/*' element={<Home />}></Route>
             <Route path="/login/*" element={<Login />} /> 
             <Route path="/welcome" element={<Welcome />} /> 
             <Route path="/recommend" element={<Recommend />} />
