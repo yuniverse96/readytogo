@@ -110,12 +110,14 @@ export default function ResultCloset() {
           const data = doc.data();
           if (data.date) {
             const currentDiff = diff(data.date);
+         
             if (currentDiff < minDiff) {
               minDiff = currentDiff;
               closestDoc = { id: doc.id, ...data };
             }
           }
         });
+        
         setNearestRec(closestDoc);
       } catch (error) {
         console.error('Error fetching recommendations:', error);
@@ -162,7 +164,8 @@ export default function ResultCloset() {
 
   return (
     <div id='result_closet'>
-      <h2>오늘과 가장 가까운 기록 문서 기준.</h2>
+      <h2>오늘과 가장 가까운 기록 문서 {nearestRec?.date} 기준.</h2>
+   
       <br/>
       <h3>단기예보 데이터</h3>
       <p>약속시간은 {nearestRec?.meetingTime ? formatMeetingTime(nearestRec.meetingTime) : '정보 없음'} 입니다.</p>

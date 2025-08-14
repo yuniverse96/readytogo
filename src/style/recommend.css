@@ -59,11 +59,15 @@
 #rec_swiper .form_select .temp p {font-size: 20px; font-weight: 500; color: #bcbcbc;}
 
 
-#rec_swiper .form_select .now_condition { margin-top: 100px;}
-#rec_swiper .form_select .now_condition ul{display: flex; flex-wrap: wrap; gap: 5px; align-items: center;}
-#rec_swiper .form_select .now_condition ul li {width: 10px; padding: 18px 5px;flex: 1 1 15%; text-align: center; color: #bcbcbc; font-size: 16px; line-height: normal; text-align: center;}
+#rec_swiper .form_select .now_condition { margin-top: 100px; position: relative;}
+#rec_swiper .form_select .now_condition::after {content: ""; display: block; width: 80%; height: 1px; border-top: 3px dotted #dadada; position: absolute; top: 55%; left: 50%; transform: translate(-50%,-50%);}
+#rec_swiper .form_select .now_condition ul{position: relative; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; z-index: 100;}
+#rec_swiper .form_select .now_condition ul li {background: none; flex: 1 1 auto; outline: none !important; }
+#rec_swiper .form_select .now_condition ul li label{ display: flex; flex-direction: column; align-items: center; gap: 10px; color: #606060; font-size: 12px; line-height: normal;}
+#rec_swiper .form_select .now_condition ul li label::before {box-sizing: border-box;content: ""; display: block; width: 35px; height: 35px; border-radius: 35px; border: 2px solid #dadada; background-color: #f7f7f7;}
+#rec_swiper .form_select .now_condition ul li input:checked + label::before {background: #00bff9 url(../../public/images/color_check.svg) no-repeat center center / 17px 16px; border: none;}
 
-
+/* #rec_swiper .form_select .now_condition ul li label { } */
 /* 
 #rec_swiper .form_select .temp .temp_input.hsv::after {content: ""; margin-left: auto; display: block; width: 19px; height: 19px;  background: url(../../public/images/select.png) no-repeat center center / cover;} */
 

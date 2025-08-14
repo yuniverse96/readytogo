@@ -57,7 +57,7 @@ function Recommend() {
       case 1:
         return data.constitution !== '';
       case 2:
-        return data.season !== '' && data.temperature.trim() !== '';
+        return data.season !== '' && data.temperature.trim() !== '' && data.condition !== '';
       case 3:
         return data.topWear.length > 0 || data.topInner.length > 0;
       case 4:
@@ -424,7 +424,7 @@ function Recommend() {
                 </div>
 
                 <div className='now_condition'>
-                    <h4>지금의 온도가 나에게는?</h4>
+                    <h4>현재 상태를 알려주세요.</h4>
                     <ul>
                       <li>
                           <input
