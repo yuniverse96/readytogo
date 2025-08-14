@@ -51,21 +51,30 @@ function SpotArea() {
     return allMinutes;
   }
   
+  const hourRefs = useRef([]);
+  const minuteRefs = useRef([]);
 
-  const handleHourSelect = (hour) => {
+
+  const handleHourSelect = (hour,index,e) => {
     setSelectedHour(hour);
     setFormData(prev => ({
       ...prev,
       meetingTime: `${hour}:${selectedMinute || '00'}`,
     }));
+
+    // 클릭한 li를 중앙으로
+    e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+
   };
   
-  const handleMinuteSelect = (minute) => {
+  const handleMinuteSelect = (minute,index,e) => {
     setSelectedMinute(minute);
     setFormData(prev => ({
       ...prev,
       meetingTime: `${selectedHour || '00'}${minute}`,
     }));
+    e.currentTarget.scrollIntoView({ block: 'center', behavior: 'smooth' });
   };
   
 
@@ -197,22 +206,22 @@ function SpotArea() {
 
         <div className='time_picker'>
           <ul className="hour_list">
-              {hours.map(h => (
+              {hours.map((h,i) => (
                 <li
                   key={h}
                   className={selectedHour === h ? 'selected' : ''}
-                  onClick={() => handleHourSelect(h)}
+                  onClick={(e) => handleHourSelect(h,i,e)}
                 >
                   {h}시
                 </li>
               ))}
           </ul>
           <ul className="minute_list">
-            {getAvailableMinutes(selectedHour).map(m => (
+            {getAvailableMinutes(selectedHour).map((m,i) => (
               <li
                 key={m}
                 className={selectedMinute === m ? 'selected' : ''}
-                onClick={() => handleMinuteSelect(m)}
+                onClick={(e) => handleMinuteSelect(m,i,e)}
               >
                 {m}분
               </li>
