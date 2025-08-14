@@ -108,7 +108,46 @@
 
 #map .map_box {width: 100%; padding: 20px 0; box-sizing: border-box;}
 #map .map_area {width: 100%;aspect-ratio: 320 / 150;}
-#map .time_picker {width: 100%; display: flex; flex-wrap: wrap; gap: 10px;}
+/* #map .time_picker {width: 100%; display: flex; flex-wrap: wrap; gap: 10px;}
 #map .time_picker ul {width: 10px; height: 120px; overflow: hidden scroll; flex: 1 1 30%;}
 #map .time_picker ul li {color: #ccc; height: 40px;}
-#map .time_picker ul li.selected {color: #00242e;}
+#map .time_picker ul li.selected {color: #00242e;} */
+
+#map .time_picker {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  #map .time_picker ul {
+    flex: 1;
+    height: 120px; /* li 3개 노출 */
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    text-align: center;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  #map .time_picker ul::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+  
+  #map .time_picker ul li {
+    height: 40px;
+    line-height: 40px;
+    color: #ccc;
+    scroll-snap-align: center;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+  }
+  
+  #map .time_picker ul li.selected {
+    color: #00242e;
+    font-weight: bold;
+    transform: scale(1.2);
+  }
+  
