@@ -10,6 +10,7 @@ import { useWeather } from '../hooks/useWeather';
 import {useShortWeather} from '../hooks/useShortWeather';
 import AuthInput from '../component/AuthInput';
 import useSearchStore from '../store/useSearchStore';
+import PopAlert,{useAlert} from '../component/PopAlert';
 
 import IconWeather from '../component/IconWeather';
 
@@ -83,10 +84,15 @@ function HomeMain() {
   };
 
 
+  //커스텀 얼럿.
+const { showAlert } = useAlert();
+
 const handleSearchClick = async () => {
   if (!userId || !user?.uid) {
-    alert("로그인 후 이용해주세요!");
-    navigate('/login');
+    showAlert("로그인 후 이용해주세요!", [
+      { text: "로그인하러 가기", onClick: () => navigate("/login") },
+      { text: "취소",onClick: () => {}, className:"close"}
+    ]);
     return;
   }
 
@@ -114,20 +120,24 @@ const handleSearchClick = async () => {
         console.log(diffDays,"차이")
         //최신문서 7일 이상 차이날때 재입력 페이지로 넘어감.
         if (diffDays > 7) {
-          alert("입력했던 정보가 너무 오래됐어요 재입력해주세요!");
-          navigate("/recommend");
+          showAlert("입력했던 정보가 너무 오래됐어요! 재입력해주세요.", [
+            { text: "입력하러 가기", onClick: () => navigate("/recommend") }
+          ]);
         }
 
       navigate('/spotarea');
     } else {
-      alert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주시면 도와드릴게요.");
-      navigate('/recommend');
+      showAlert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주세요.", [
+        { text: "입력하러 가기", onClick: () => navigate("/recommend") }
+      ]);
     }
 
   } catch (error) {
-    alert("정보 조회 중 에러가 발생했습니다.");
     console.error("Firestore 문서 조회 에러:", error);
-    navigate('/recommend');
+      showAlert("정보 조회 중 에러가 발생했습니다.", [
+        { text: "재입력하기", onClick: () => navigate("/recommend") }
+      ]);
+    console.error("Firestore 문서 조회 에러:", error);
   }
 };
 
@@ -244,8 +254,10 @@ const handleSearchClick = async () => {
           className='recommend_today'  
           onClick={() => {
             if (!user) {
-              alert("로그인 후 이용해주세요!");
-              navigate('/login');
+              showAlert("로그인 후 이용해주세요!", [
+                { text: "로그인하러 가기", onClick: () => navigate("/login") },
+                { text: "취소",onClick: () => {}, className:"close"}
+              ]);
               return;
             }
             navigate('/result_closet');
@@ -258,8 +270,10 @@ const handleSearchClick = async () => {
             className='recommend_write' 
             onClick={() => {
               if (!user) {
-                alert("로그인 후 이용해주세요!");
-                navigate('/login');
+                showAlert("로그인 후 이용해주세요!", [
+                  { text: "로그인하러 가기", onClick: () => navigate("/login") },
+                  { text: "취소",onClick: () => {}, className:"close"}
+                ]);
                 return;
               }
               navigate('/recommend');
@@ -274,6 +288,9 @@ const handleSearchClick = async () => {
           <img src={`${process.env.PUBLIC_URL}/images/musinsa_ad.png`} alt="ad" />
         </div>
       </section>
+
+      <PopAlert />
+
     </div>
   );
 }
