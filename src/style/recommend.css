@@ -103,5 +103,8 @@
 #map .search_box .search_input .input_wrap .search_btn {width: 18px; height: 18px; text-indent: -9999px; background: url(../../public/images/search_btn.png) no-repeat center center / cover;}
 
 #map .map_box {width: 100%; padding: 20px 0; box-sizing: border-box;}
-#map .map_area {width: 100%;aspect-ratio: 320 / 280;}
-
+#map .map_area {width: 100%;aspect-ratio: 320 / 150;}
+#map .time_picker {width: 100%; display: flex; flex-wrap: wrap; gap: 10px;}
+#map .time_picker ul {width: 10px; height: 120px; overflow: hidden scroll; flex: 1 1 30%;}
+#map .time_picker ul li {color: #ccc; height: 40px;}
+#map .time_picker ul li.selected {color: #00242e;}
