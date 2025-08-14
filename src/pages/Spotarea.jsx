@@ -9,6 +9,9 @@ import { AuthContext } from '../AuthContext';
 import KakaoMapSearch from '../component/KakaoMap';
 import useSearchStore from '../store/useSearchStore';
 import { gsap } from 'gsap';
+
+import PopAlert,{useAlert} from '../component/PopAlert';
+
 import '../style/recommend.css';
 
 function SpotArea() {
@@ -66,6 +69,8 @@ function SpotArea() {
   };
   
 
+  //커스텀 얼럿.
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,12 +92,15 @@ function SpotArea() {
           setFormData(latestDoc.data());
           setDocId(latestDoc.id);
         } else {
-          alert('이전 정보를 찾을 수 없습니다.');
-          navigate('/recommend');
+          showAlert("이전 정보를 찾을 수 없습니다.", [
+            { text: "입력하러 가기", onClick: () => navigate("/recommend") }
+          ]);
         }
       } catch (error) {
         console.error('Firestore read error:', error);
-        alert(`데이터를 불러오는데 실패했습니다: ${error.message}`);
+        showAlert(`데이터를 불러오는데 실패했습니다: ${error.message}`, [
+          { text: "확인",onClick: () => {}, className:"close"}
+        ]);
       } finally {
         setLoading(false);
       }
@@ -119,12 +127,17 @@ function SpotArea() {
     e.preventDefault();
 
     if (!user) {
-      alert('로그인 후 이용해주세요.');
+      showAlert("로그인 후 이용해주세요!", [
+        { text: "로그인하러 가기", onClick: () => navigate("/login") },
+        { text: "취소",onClick: () => {}, className:"close"}
+      ]);
       return;
     }
 
     if (!docId) {
-      alert('업데이트할 문서를 찾을 수 없습니다.');
+      showAlert('업데이트할 문서를 찾을 수 없습니다.', [
+        { text: "확인",onClick: () => {}, className:"close"}
+      ]);
       return;
     }
 
@@ -134,10 +147,11 @@ function SpotArea() {
         uid: user.uid,
         email: user.email,
       });
-      alert('제출 완료!');
+      showAlert('제출 완료.', [
+        { text: "확인",onClick: () => navigate("/result_closet")}
+      ]);
       setAddress('');
-      navigate('/result_closet');
-
+      
       // 제출 후 초기화
       setFormData({
         meetingPlace: '',
@@ -147,7 +161,9 @@ function SpotArea() {
       setIsPlaceSelected(false);
     } catch (error) {
       console.error('제출 실패:', error);
-      alert('제출 실패했습니다. 다시 시도해주세요.');
+      showAlert('제출 실패했습니다. 다시 시도해주세요.', [
+        { text: "확인",onClick: () => {}, className:"close"}
+      ]);
     }
   };
 
