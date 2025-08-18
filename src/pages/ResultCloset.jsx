@@ -2,24 +2,25 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import useUserId from '../hooks/useUserId';
 import { convertGRID_GPS, getBaseDateTime, getShortTermForecast } from '../api/WeatherApi';
 import '../style/resultCloset.css';
 
 // 체질 보정값
 const constitutionAdjust = {
-  '더위 많이 탐': (temp) => temp + (temp - 24) * 0.2,
-  '추위 많이 탐': (temp) => temp - (24 - temp) * 0.2,
-  '보통': (temp) => temp,
-  '둘 다 많이 탐': (temp) => temp + (temp - 24) * 0.2 - (24 - temp) * 0.2
+  'SH': (temp) => temp + (temp - 24) * 0.2,
+  'SH': (temp) => temp - (24 - temp) * 0.2,
+  'NHC': (temp) => temp,
+  'SHC': (temp) => temp + (temp - 24) * 0.2 - (24 - temp) * 0.2
 };
 
 // 옷 기준 보정값
 const conditionAdjust = {
-  '완전더움': +3,
-  '더움': +1.5,
-  '보통': 0,
-  '추움': -1.5,
-  '완전추움': -3
+  'sohot': +3,
+  'hot': +1.5,
+  'normal': 0,
+  'cold': -1.5,
+  'socold': -3
 };
 
 // 체감온도 계산
@@ -33,9 +34,9 @@ function calcFeelTemp(realTemp, constitution, condition) {
 
 // 체감온도에 따른 상태
 function getTempStatus(feelTemp) {
-  if (feelTemp >= 28) return '덥다';
-  if (feelTemp <= 20) return '춥다';
-  return '적당하다';
+  if (feelTemp >= 28) return '더울';
+  if (feelTemp <= 20) return '추울';
+  return '적당할';
 }
 
 // 체감온도 기반 옷 추천
@@ -87,7 +88,7 @@ export default function ResultCloset() {
   const [shortTermData, setShortTermData] = useState(null);
   const user = auth.currentUser;
   const navigate = useNavigate();
-
+  const userId = useUserId();
   // 가장 가까운 추천 문서 가져오기
   useEffect(() => {
     if (!user) return;
@@ -168,7 +169,7 @@ export default function ResultCloset() {
    
       <br/>
       <h3>단기예보 데이터</h3>
-      <p>약속시간은 {nearestRec?.meetingTime ? formatMeetingTime(nearestRec.meetingTime) : '정보 없음'} 입니다.</p>
+      <p> {nearestRec?.meetingPlace}에서 {nearestRec?.meetingTime ? formatMeetingTime(nearestRec.meetingTime) : '정보 없음'} 시에 만나기로 했어요</p>
 
       {interpolatedTemp !== null ? (
         (() => {
@@ -178,9 +179,9 @@ export default function ResultCloset() {
 
           return (
             <div>
-              <div>보간 기온: {interpolatedTemp.toFixed(1)}°C</div>
-              <div>체감온도: {feelTemp.toFixed(1)}°C → {status}</div>
-              <div>추천 옷차림: {recommendation}</div>
+              <div>그곳의 온도는 {interpolatedTemp.toFixed(1)}°C 이고 </div>
+              <div>체감온도는 {feelTemp.toFixed(1)}°C 입니다. {userId}님께 {status}거예요. </div>
+              <div>추천 옷차림으로는 {recommendation}가 있어요!</div>
             </div>
           );
         })()
