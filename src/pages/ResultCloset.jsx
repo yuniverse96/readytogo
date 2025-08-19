@@ -82,13 +82,13 @@ export default function ResultCloset() {
   };
 
   const FEEL_LEVEL_TEXT = {
-    socold: '완전 추울',
-    cold: '추울',
-    normal: '보통일',
-    hot: '더울',
-    sohot: '완전 더울'
+    socold: '매우 추운',
+    cold: '추운',
+    normal: '보통인',
+    hot: '더운',
+    sohot: '매우 더운'
   };
-  const feelText = FEEL_LEVEL_TEXT[estimatedFeelLevel] || '정보 없음';
+  const feelText = FEEL_LEVEL_TEXT[estimatedFeelLevel] || '--';
 
 
   const formatTime = (timeStr) => {
@@ -126,10 +126,10 @@ export default function ResultCloset() {
             <img src={`${process.env.PUBLIC_URL}/images/${estimatedFeelLevel}.png`} alt={`${estimatedFeelLevel}`} />
           </div>
           <p className='recommend_txt'>
-              오늘 <b>{nearestRec?.meetingTime ? formatTime(nearestRec.meetingTime) : '--'}</b>시 <b>{nearestRec?.meetingPlace}</b>에 방문할 예정이시군요? <br/>
+              <b>{nearestRec?.meetingTime ? formatTime(nearestRec.meetingTime) : '--'}</b>시 <b>{nearestRec?.meetingPlace}</b>에는 <br/>
               <b>{recommendInfo.recommendation}</b> 가 적당해요!
           </p>    
-          <p className='notice'> 체감온도는 <b>{recommendInfo.feelTemp.toFixed(1)}°C</b> 입니다. <br/>{userId}님께 <b className={estimatedFeelLevel}>{feelText}</b>거예요.</p>
+          <p className='notice'> 체감온도는 <b>{recommendInfo.feelTemp.toFixed(1)}°C</b> 입니다. <br/>{userId}님에게 <b className={estimatedFeelLevel}>{feelText}</b> 온도에요.</p>
         </div>
       </section>
     </div>
