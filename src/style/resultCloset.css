@@ -16,9 +16,9 @@
 #result_closet .recommend_box .closet_icon {width: 20%; margin: 60px auto; overflow: hidden;}
 #result_closet .recommend_box .closet_icon img {width: 100%; height: 100%; object-fit: cover;}
 
-#result_closet .recommend_box .recommend_txt {font-size: 16px; font-weight: 500; line-height: 21px;text-align: center; color: #00242e;}
+#result_closet .recommend_box .recommend_txt {font-size: 16px; font-weight: 500; line-height: 21px;text-align: center; color: #00242e; word-break: keep-all;}
 #result_closet .recommend_box .recommend_txt b {font-weight: 700;}
-#result_closet .recommend_box .notice {font-size: 12px; margin: 20px 0px 30px; text-align: center; color: #656565;}
+#result_closet .recommend_box .notice {font-size: 12px; margin: 20px 0px 30px; text-align: center; color: #656565;word-break: keep-all;}
 #result_closet .recommend_box .notice b {font-weight: 700;}
 #result_closet .recommend_box .notice .sohot,
 #result_closet .recommend_box .notice .hot {color: rgb(176, 73, 73);} 

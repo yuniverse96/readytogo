@@ -128,7 +128,7 @@ export default function ResultCloset() {
               오늘 <b>{nearestRec?.meetingTime ? formatTime(nearestRec.meetingTime) : '--'}</b>시 <b>{nearestRec?.meetingPlace}</b>에 방문할 예정이시군요? <br/>
               <b>{recommendInfo.recommendation}</b> 가 적당해요!
           </p>    
-          <p className='notice'> 체감온도는 <b>{recommendInfo.feelTemp.toFixed(1)}°C</b> 입니다. {userId}님께 <b className={estimatedFeelLevel}>{feelText}</b>거예요.</p>
+          <p className='notice'> 체감온도는 <b>{recommendInfo.feelTemp.toFixed(1)}°C</b> 입니다. <br/>{userId}님께 <b className={estimatedFeelLevel}>{feelText}</b>거예요.</p>
         </div>
       </section>
     </div>
