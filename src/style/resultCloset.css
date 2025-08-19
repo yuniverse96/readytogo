@@ -1,1 +1,31 @@
 #result_closet {height: 100%; background-color: #f7f7f7; padding: 0 20px;}
+#result_closet .recommend_wrap {width: 100%; padding-top: 35px;}
+#result_closet .recommend_wrap .title {width: 100%; margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center;}
+#result_closet .recommend_wrap .title h2 {font-size:20px; font-weight: 500; color: #00242e;}
+#result_closet .recommend_wrap .title h2 b {font-weight: 700;}
+#result_closet .recommend_wrap .title p {margin-left: auto; font-size: 14px; color: #00242e;}
+
+#result_closet .recommend_box {width: 100%; background-color: #fff; padding: 16px 18px; border-radius: 20px;} 
+#result_closet .recommend_box .weather_box {width: 100%; display: flex; flex-wrap: wrap; align-items: center;}
+#result_closet .recommend_box .weather_box .temp {display: flex; gap: 5px; align-items: center;}
+#result_closet .recommend_box .weather_box .temp p {color: #00242e; font-size: 22px; font-weight: 500;}
+#result_closet .recommend_box .weather_box .rh_temp {margin-left: auto;}
+#result_closet .recommend_box .weather_box .rh_temp li {font-size: 12px; color: #00242e; font-weight: 500; display: flex; align-items: center; gap: 5px;}
+#result_closet .recommend_box .weather_box .rh_temp li span{font-size: 8px; line-height: 12px;}
+
+#result_closet .recommend_box .closet_icon {width: 20%; margin: 60px auto; overflow: hidden;}
+#result_closet .recommend_box .closet_icon img {width: 100%; height: 100%; object-fit: cover;}
+
+#result_closet .recommend_box .recommend_txt {font-size: 16px; font-weight: 500; line-height: 21px;text-align: center; color: #00242e; word-break: keep-all;}
+#result_closet .recommend_box .recommend_txt b {font-weight: 700;}
+#result_closet .recommend_box .notice {font-size: 12px; margin: 20px 0px 30px; text-align: center; color: #656565;word-break: keep-all;}
+#result_closet .recommend_box .notice b {font-weight: 700;}
+#result_closet .recommend_box .notice .sohot,
+#result_closet .recommend_box .notice .hot {color: rgb(176, 73, 73);} 
+#result_closet .recommend_box .notice .socold,
+#result_closet .recommend_box .notice .cold {color: rgb(73, 114, 176);} 
+
+/*아이콘 구름 컬러값 변경.*/
+#cloud {fill: #D9F6FF;}
+
+
