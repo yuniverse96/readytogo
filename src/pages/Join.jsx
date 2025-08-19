@@ -91,14 +91,14 @@ function Join() {
         return;
       }
   
-      const isValid = /^[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?\\/-]{4,12}$/.test(password);
+      const isValid = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?\\/-]{6,12}$/.test(password);
   
       setFormError(prev => ({
         ...prev,
         password: {
           msg: isValid
             ? '사용 가능한 비밀번호입니다.'
-            : '비밀번호는 4~12자이며 영문, 숫자, 특수문자가 가능합니다.',
+            : '비밀번호는 6~12자이며 영문, 숫자, 특수문자를 포함해야합니다.',
           type: isValid ? 'success' : 'error'
         }
       }));
