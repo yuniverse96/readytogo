@@ -9,11 +9,6 @@ import {
 } from '../api/RealtimeWeatherApi';
 import { getAirQuality } from '../api/AirApi';
 
-const DEFAULT_COORDINATES = {
-  lat: 37.5665,
-  lon: 126.9780,
-};
-
 const getHumidityStatus = reh => {
   if (reh === undefined) return '보통';
   if (reh >= 40 && reh <= 60) return '좋음';
