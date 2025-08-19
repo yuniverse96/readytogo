@@ -6,6 +6,7 @@ import useUserId from '../hooks/useUserId';
 import { convertGRID_GPS, getBaseDateTime, getShortTermForecast } from '../api/WeatherApi';
 import { useWeather } from '../hooks/useWeather';
 import IconWeather from '../component/IconWeather';
+import Loading from '../component/Loading';
 import '../style/resultCloset.css';
 
 
@@ -94,7 +95,7 @@ export default function ResultCloset() {
     if (!timeStr || timeStr.length !== 4) return timeStr;
     return `${timeStr.slice(0,2)}:${timeStr.slice(2,4)}`;
   };
-  if (isLoading || !recommendInfo) return <div id='loading_wrap'><span className='loading_icon'></span></div>;
+  if (isLoading || !recommendInfo) return <Loading />;
   return (
     <div id="result_closet">
       <section className="recommend_wrap">
