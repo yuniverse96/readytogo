@@ -300,11 +300,12 @@ const handleSearchClick = (navigateTarget) => async () => {
             className='recommend_write' 
             onClick={() => {
               if (!user) {
-                alert("로그인 후 이용해주세요!");
-                navigate('/login');
+                showAlert("로그인 후 이용해주세요!", [
+                  { text: "로그인하러 가기", onClick: () => navigate("/login") },
+                  { text: "취소",onClick: () => {}, className:"close"}
+                ]);
                 return;
               }
-              navigate('/recommend');
             }}
           >
           <h3>오늘의<br/>체감 기록</h3>
