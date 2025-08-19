@@ -120,16 +120,28 @@ const handleSearchClick = async () => {
         console.log(diffDays,"차이")
         //최신문서 7일 이상 차이날때 재입력 페이지로 넘어감.
         if (diffDays > 7) {
-          showAlert("입력했던 정보가 너무 오래됐어요! 재입력해주세요.", [
-            { text: "입력하러 가기", onClick: () => navigate("/recommend") }
-          ]);
+          showAlert(
+            <>
+              입력했던 정보가 너무 오래됐어요!<br />
+              재입력해주세요.
+            </>,
+            [
+              { text: "입력하러 가기", onClick: () => navigate("/recommend") }
+            ]
+          );
         }
 
       navigate('/spotarea');
     } else {
-      showAlert("아직 정보를 입력하지 않으셨어요! 정보를 먼저 입력해 주세요.", [
-        { text: "입력하러 가기", onClick: () => navigate("/recommend") }
-      ]);
+      showAlert(
+        <>
+          아직 정보를 입력하지 않으셨어요!<br />
+          정보를 먼저 입력해 주세요.
+        </>,
+        [
+          { text: "입력하러 가기", onClick: () => navigate("/recommend") }
+        ]
+      );
     }
 
   } catch (error) {
@@ -252,32 +264,14 @@ const handleSearchClick = async () => {
       <section className='recommend_wrap'>
       <div 
           className='recommend_today'  
-          onClick={() => {
-            if (!user) {
-              showAlert("로그인 후 이용해주세요!", [
-                { text: "로그인하러 가기", onClick: () => navigate("/login") },
-                { text: "취소",onClick: () => {}, className:"close"}
-              ]);
-              return;
-            }
-            navigate('/result_closet');
-          }}
+          onClick={handleSearchClick} 
         >
           <h3>오늘의<br/>추천 코디</h3>
           <span className='icon_wrap'></span>
         </div>
         <div 
             className='recommend_write' 
-            onClick={() => {
-              if (!user) {
-                showAlert("로그인 후 이용해주세요!", [
-                  { text: "로그인하러 가기", onClick: () => navigate("/login") },
-                  { text: "취소",onClick: () => {}, className:"close"}
-                ]);
-                return;
-              }
-              navigate('/recommend');
-            }}
+            onClick={handleSearchClick} 
           >
           <h3>오늘의<br/>체감 기록</h3>
           <span className='icon_wrap'></span>
