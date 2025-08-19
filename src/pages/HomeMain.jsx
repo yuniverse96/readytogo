@@ -53,40 +53,46 @@ function HomeMain() {
 
   // 위치 요청 함수 분리
 // 위치 요청 함수 분리
+// 위치 요청 함수 변경
 const fetchCurrentPosition = () => {
-  if (navigator.geolocation) {
-    // Edge 등 브라우저 호환을 위해 옵션 최적화
-    const options = {
-      enableHighAccuracy: false, // 정확도 너무 높게 하면 Edge에서 실패 가능
-      timeout: 5000,
-      maximumAge: 0
-    };
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLat(pos.coords.latitude);
-        setLon(pos.coords.longitude);
-      },
-      (err) => {
-        console.warn('위치 정보 오류:', err);
-        // 실패 시 서울시청 좌표로 fallback
-        setLat(37.5665);
-        setLon(126.9780);
-      },
-      options
-    );
-  } else {
+  if (!navigator.geolocation) {
     console.warn('이 브라우저는 위치 정보 기능을 지원하지 않음');
-    // 브라우저 지원 안 하면 fallback
     setLat(37.5665);
     setLon(126.9780);
+    return;
   }
+
+  const options = {
+    enableHighAccuracy: false, // Edge 호환성 위해 false
+    timeout: 10000,
+    maximumAge: 0
+  };
+
+  const watcherId = navigator.geolocation.watchPosition(
+    (pos) => {
+      // 위치 잡히면 상태 업데이트
+      setLat(pos.coords.latitude);
+      setLon(pos.coords.longitude);
+
+      // 위치가 잡혔으니 watch 종료
+      navigator.geolocation.clearWatch(watcherId);
+    },
+    (err) => {
+      console.warn('위치 정보 오류:', err);
+      // 5초 안에 못 잡으면 fallback
+      setLat(37.5665);
+      setLon(126.9780);
+      // watch 계속 유지 → 이후 위치 잡히면 상태 업데이트 가능
+    },
+    options
+  );
 };
 
 // useEffect에서 호출
 useEffect(() => {
   fetchCurrentPosition();
 }, []);
+
 
 
 
