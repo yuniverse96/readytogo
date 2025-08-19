@@ -52,25 +52,42 @@ function HomeMain() {
   }, [showFirst]);
 
   // 위치 요청 함수 분리
-  const fetchCurrentPosition = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setLat(pos.coords.latitude);
-          setLon(pos.coords.longitude);
-        },
-        (err) => {
-          console.error('위치 정보 오류:', err);
-        }
-      );
-    } else {
-      console.error('이 브라우저는 위치 정보 기능을 지원하지 않음');
-    }
-  };
+// 위치 요청 함수 분리
+const fetchCurrentPosition = () => {
+  if (navigator.geolocation) {
+    // Edge 등 브라우저 호환을 위해 옵션 최적화
+    const options = {
+      enableHighAccuracy: false, // 정확도 너무 높게 하면 Edge에서 실패 가능
+      timeout: 5000,
+      maximumAge: 0
+    };
 
-  useEffect(() => {
-    fetchCurrentPosition();
-  }, []);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLat(pos.coords.latitude);
+        setLon(pos.coords.longitude);
+      },
+      (err) => {
+        console.warn('위치 정보 오류:', err);
+        // 실패 시 서울시청 좌표로 fallback
+        setLat(37.5665);
+        setLon(126.9780);
+      },
+      options
+    );
+  } else {
+    console.warn('이 브라우저는 위치 정보 기능을 지원하지 않음');
+    // 브라우저 지원 안 하면 fallback
+    setLat(37.5665);
+    setLon(126.9780);
+  }
+};
+
+// useEffect에서 호출
+useEffect(() => {
+  fetchCurrentPosition();
+}, []);
+
 
 
 
@@ -87,7 +104,7 @@ function HomeMain() {
   //커스텀 얼럿.
 const { showAlert } = useAlert();
 
-const handleSearchClick = async () => {
+const handleSearchClick = (navigateTarget) => async () => {
   if (!userId || !user?.uid) {
     showAlert("로그인 후 이용해주세요!", [
       { text: "로그인하러 가기", onClick: () => navigate("/login") },
@@ -103,7 +120,7 @@ const handleSearchClick = async () => {
     // recommendations 컬렉션에서 uid가 일치하는 문서 중 최신 날짜순 정렬
     const q = query(
       collection(db, "recommendations"),
-      where("uid", "==", user.uid),
+      where("uid", "==", user.uid), 
       orderBy("time", "desc"),
       limit(1)
     );
@@ -129,9 +146,11 @@ const handleSearchClick = async () => {
               { text: "입력하러 가기", onClick: () => navigate("/recommend") }
             ]
           );
+          return;
         }
+      
 
-      navigate('/spotarea');
+      navigate(navigateTarget);
     } else {
       showAlert(
         <>
@@ -142,6 +161,7 @@ const handleSearchClick = async () => {
           { text: "입력하러 가기", onClick: () => navigate("/recommend") }
         ]
       );
+      return;
     }
 
   } catch (error) {
@@ -151,6 +171,7 @@ const handleSearchClick = async () => {
       ]);
     console.error("Firestore 문서 조회 에러:", error);
   }
+
 };
 
 
@@ -209,7 +230,7 @@ const handleSearchClick = async () => {
               placeholder="오늘 어디가세요?"
               showBtn="search"
               btnText="검색"
-              onButtonClick={handleSearchClick}
+              onButtonClick={handleSearchClick('/spotarea')}
             />
       </section>
 
@@ -264,14 +285,21 @@ const handleSearchClick = async () => {
       <section className='recommend_wrap'>
       <div 
           className='recommend_today'  
-          onClick={handleSearchClick} 
+          onClick={handleSearchClick('/result_closet')} 
         >
           <h3>오늘의<br/>추천 코디</h3>
           <span className='icon_wrap'></span>
         </div>
         <div 
             className='recommend_write' 
-            onClick={handleSearchClick} 
+            onClick={() => {
+              if (!user) {
+                alert("로그인 후 이용해주세요!");
+                navigate('/login');
+                return;
+              }
+              navigate('/recommend');
+            }}
           >
           <h3>오늘의<br/>체감 기록</h3>
           <span className='icon_wrap'></span>
