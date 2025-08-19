@@ -104,7 +104,7 @@ useEffect(() => {
   //커스텀 얼럿.
 const { showAlert } = useAlert();
 
-const handleSearchClick = async () => {
+const handleSearchClick = (navigateTarget) => async () => {
   if (!userId || !user?.uid) {
     showAlert("로그인 후 이용해주세요!", [
       { text: "로그인하러 가기", onClick: () => navigate("/login") },
@@ -120,7 +120,7 @@ const handleSearchClick = async () => {
     // recommendations 컬렉션에서 uid가 일치하는 문서 중 최신 날짜순 정렬
     const q = query(
       collection(db, "recommendations"),
-      where("uid", "==", user.uid),
+      where("uid", "==", user.uid), 
       orderBy("time", "desc"),
       limit(1)
     );
@@ -146,9 +146,11 @@ const handleSearchClick = async () => {
               { text: "입력하러 가기", onClick: () => navigate("/recommend") }
             ]
           );
+          return;
         }
+      
 
-      navigate('/spotarea');
+      navigate(navigateTarget);
     } else {
       showAlert(
         <>
@@ -159,6 +161,7 @@ const handleSearchClick = async () => {
           { text: "입력하러 가기", onClick: () => navigate("/recommend") }
         ]
       );
+      return;
     }
 
   } catch (error) {
@@ -168,6 +171,7 @@ const handleSearchClick = async () => {
       ]);
     console.error("Firestore 문서 조회 에러:", error);
   }
+
 };
 
 
@@ -226,7 +230,7 @@ const handleSearchClick = async () => {
               placeholder="오늘 어디가세요?"
               showBtn="search"
               btnText="검색"
-              onButtonClick={handleSearchClick}
+              onButtonClick={handleSearchClick('/spotarea')}
             />
       </section>
 
@@ -281,14 +285,21 @@ const handleSearchClick = async () => {
       <section className='recommend_wrap'>
       <div 
           className='recommend_today'  
-          onClick={handleSearchClick} 
+          onClick={handleSearchClick('/result_closet')} 
         >
           <h3>오늘의<br/>추천 코디</h3>
           <span className='icon_wrap'></span>
         </div>
         <div 
             className='recommend_write' 
-            onClick={handleSearchClick} 
+            onClick={() => {
+              if (!user) {
+                alert("로그인 후 이용해주세요!");
+                navigate('/login');
+                return;
+              }
+              navigate('/recommend');
+            }}
           >
           <h3>오늘의<br/>체감 기록</h3>
           <span className='icon_wrap'></span>
