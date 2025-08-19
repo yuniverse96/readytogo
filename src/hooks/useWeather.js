@@ -1,394 +1,206 @@
 // src/hooks/useWeather.js
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  getShortTermForecast,
-  convertGRID_GPS,
-  getBaseDateTime,
-} from '../api/WeatherApi';
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../firebase";
+import { getShortTermForecast, convertGRID_GPS, getBaseDateTime } from '../api/WeatherApi';
 
-const DEFAULT_COORDINATES = {
-  lat: 37.5665,  // 서울시 중구
-  lon: 126.9780,
-};
+// 날씨 아이콘 매핑
+const PTY_ICON_MAP = { '0':'clear','1':'rain','2':'rain_snow','3':'snow','4':'shower','5':'drizzle','6':'drizzle_snow','7':'snow_wind' };
+const SKY_ICON_MAP = { '1':'sunny','3':'cloudy','4':'overcast' };
 
-// 어제 날짜 구하기
-const getYesterdayDate = () => {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
+// 습도/풍속 상태
+const getHumidityStatus = reh => reh === undefined ? '정보 없음' : reh >= 40 && reh <= 60 ? '좋음' : (reh >= 30 && reh < 40) || (reh > 60 && reh <= 70) ? '보통' : (reh >= 20 && reh < 30) || (reh > 70 && reh <= 79) ? '나쁨' : '매우 나쁨';
+const getWindSpeedStatus = wsd => wsd === undefined ? '정보 없음' : wsd >= 1 && wsd <= 3 ? '좋음' : wsd >= 4 && wsd <= 5 ? '보통' : wsd >= 6 && wsd <= 7 ? '나쁨' : '매우 나쁨';
+function getWeatherIcon(pty, sky){ const icons=[]; if(pty && pty!=='0') icons.push(PTY_ICON_MAP[pty]||'unknown'); if(sky) icons.push(SKY_ICON_MAP[sky]||'unknown'); return icons.join('_'); }
 
-  const year = yesterday.getFullYear().toString();
-  const month = (yesterday.getMonth() + 1).toString().padStart(2, '0');
-  const day = yesterday.getDate().toString().padStart(2, '0');
+// 개인 체질/조건 보정
+const constitutionAdjust = { SH: t => t + (t-24)*0.2, SC: t => t-(24- t)*0.2, NHC: t=>t, SHC: t=>t+(t-24)*0.2-(24- t)*0.2 };
+const CONDITION_SCORE = { socold: -3, cold: -1.5, normal: 0, hot: 1.5, sohot: 3 };
 
-  return `${year}${month}${day}`; // "YYYYMMDD" 형식
-};
-
-// 예보에서 특정 시간대 온도 추출
-const extractTMPFromForecast = (forecastData, targetHour) => {
-  if (!forecastData) return null;
-
-  const forecastHour =
-    typeof targetHour === 'number'
-      ? `${Math.floor(targetHour / 3) * 3}`.padStart(2, '0') + '00'
-      : '1500';
-
-  const filtered = forecastData.filter(item => item.fcstTime === forecastHour);
-  const tmpItem = filtered.find(item => item.category === 'TMP');
-
-  return tmpItem ? Number(tmpItem.fcstValue) : null;
-};
-
-// 계절 판단
-const getSeason = month => {
-  if ([3, 4, 5].includes(month)) return 'spring';
-  if ([6, 7, 8].includes(month)) return 'summer';
-  if ([9, 10, 11].includes(month)) return 'fall';
-  return 'winter';
-};
-
-// 오늘-어제 온도 비교 멘트 생성
-const getTempComparisonMessage = (todayTemp, yesterdayTemp, currentMonth) => {
-  if (todayTemp == null || yesterdayTemp == null) return '';
-
-  const diff = todayTemp - yesterdayTemp;
-  const absDiff = Math.abs(diff);
-  const season = getSeason(currentMonth);
-
-  const message = {
-    summer: {
-      up: ['어제와 비슷해요.', '어제보다 조금 더 더워요.', '어제보다 더 더워요.', '어제보다 훨씬 더 더워요.'],
-      down: ['어제보다 조금 시원해요.', '어제보다 더 시원해요.', '어제보다 훨씬 더 시원해요.'],
-    },
-    winter: {
-      up: ['어제와 비슷해요.', '어제보다 조금 더 따뜻해요.', '어제보다 더 따뜻해요.', '어제보다 훨씬 더 따뜻해요.'],
-      down: ['어제보다 조금 더 추워요.', '어제보다 더 추워요.', '어제보다 훨씬 더 추워요.'],
-    },
-    spring: {
-      up: ['어제와 비슷해요.', '기온이 조금 올랐어요.', '기온이 많이 올랐어요.', '기온이 크게 올랐어요.'],
-      down: ['기온이 조금 내렸어요.', '기온이 많이 내렸어요.', '기온이 크게 떨어졌어요.'],
-    },
-    fall: {
-      up: ['어제와 비슷해요.', '약간 따뜻해졌어요.', '더 따뜻해졌어요.', '훨씬 더 따뜻해졌어요.'],
-      down: ['약간 쌀쌀해졌어요.', '더 쌀쌀졌어요.', '훨씬 더 쌀쌀해졌어요.'],
-    },
-  };
-
-  const t = message[season];
-
-  if (absDiff < 2) return t.up[0];
-
-  if (diff >= 2 && diff < 5) return t.up[1];
-  if (diff >= 5 && diff < 10) return t.up[2];
-  if (diff >= 10) return t.up[3];
-
-  if (diff <= -2 && diff > -5) return t.down[0];
-  if (diff <= -5 && diff > -10) return t.down[1];
-  if (diff <= -10) return t.down[2];
-
-  return '';
-};
-
-// 습도 상태 판단
-const getHumidityStatus = reh => {
-  if (reh === undefined) return '정보 없음';
-  if (reh >= 40 && reh <= 60) return '좋음';
-  else if ((reh >= 30 && reh < 40) || (reh > 60 && reh <= 70)) return '보통';
-  else if ((reh >= 20 && reh < 30) || (reh > 70 && reh <= 79)) return '나쁨';
-  else return '매우 나쁨';
-};
-
-// 풍속 상태 판단
-const getWindSpeedStatus = wsd => {
-  if (wsd === undefined) return '정보 없음';
-  if (wsd >= 1 && wsd <= 3) return '좋음';
-  else if (wsd >= 4 && wsd <= 5) return '보통';
-  else if (wsd >= 6 && wsd <= 7) return '나쁨';
-  else return '매우 나쁨';
-};
-
-// 대기질 상태 판단
-const getAirQualityStatus = pm10 => {
-  if (pm10 === undefined || pm10 === null || isNaN(Number(pm10))) return '정보 없음';
-
-  const value = Number(pm10);
-
-  if (value <= 30) return '좋음';
-  if (value <= 80) return '보통';
-  if (value <= 150) return '나쁨';
-  return '매우 나쁨';
-};
-
-// 강수 및 하늘 상태 아이콘 매핑
-const PTY_ICON_MAP = {
-  '0': 'clear',      // 없음
-  '1': 'rain',       // 비
-  '2': 'rain_snow',  // 비/눈
-  '3': 'snow',       // 눈
-  '4': 'shower',     // 소나기
-  '5': 'drizzle',    // 빗방울
-  '6': 'drizzle_snow', // 빗방울눈날림
-  '7': 'snow_wind',  // 눈날림
-};
-
-const SKY_ICON_MAP = {
-  '1': 'sunny',      // 맑음
-  '3': 'cloudy',     // 구름많음
-  '4': 'overcast',   // 흐림
-};
-
-const WEATHER_DESCRIPTION_MAP = {
-  'rain_overcast': '하늘이 흐리고 비가 내려요.',
-  'rain_cloudy': '구름이 많고, 비가내려요.',
-  'rain_sunny': '비가오고,',
-  'snow_cloudy': '구름이 많고, 눈이와요.',
-  'rain': '비가 내리고,',
-  'snow': '눈이 오고,',
-  'overcast': '하늘이 흐리고,',
-  'cloudy': '구름이 많고,',
-  'sunny': '맑은 날씨예요.',
-  'rain_snow_cloudy': '구름이 많고 비와 눈이 내려요.',
-  // 필요시 더 추가 가능
-};
-
-function getWeatherIcon(pty, sky) {
-  const icons = [];
-
-  // 강수 상태가 0이 아닐 때만 icon에 추가
-  if (pty && pty !== '0') {
-    icons.push(PTY_ICON_MAP[pty] || 'unknown');
-  }
-
-  // sky는 무조건 추가
-  if (sky) {
-    icons.push(SKY_ICON_MAP[sky] || 'unknown');
-  }
-
-  return icons.join('_');
+// 체감온도 계산 (계절/습도/풍속 반영)
+function calcFeelTemp(realTemp, constitution, condition, month, reh, wsd){
+  let temp = realTemp + (CONDITION_SCORE[condition] ?? 0);
+  if([12,1,2].includes(month)) temp -= 1.5;
+  if([6,7,8].includes(month)) temp += 1.5;
+  if(reh !== undefined){ if(reh>70) temp +=1; else if(reh<30) temp -=1; }
+  if(wsd !== undefined && wsd >= 4) temp -=1;
+  if(constitutionAdjust[constitution]) temp = constitutionAdjust[constitution](temp);
+  return temp;
 }
 
-export const useWeather = (lat, lon, targetHour) => {
-  const [coordinates, setCoordinates] = useState(null);
-  const [locationName, setLocationName] = useState('서울특별시 중구');
-  const [sidoName, setSidoName] = useState('서울'); // 초기값
-  const [lastRefreshTime, setLastRefreshTime] = useState(null);
+// 유저 문서 기반 체감 점수 계산
+function calcUserFeelScore({temperature, constitution, condition, season}){
+  let temp = Number(temperature.replace('+',''));
+  temp += CONDITION_SCORE[condition] ?? 0;
+  if(season === 'summer') temp += 1.5;
+  else if(season === 'winter') temp -= 1.5;
+  if(constitutionAdjust[constitution]) temp = constitutionAdjust[constitution](temp);
+  return temp;
+}
 
-  useEffect(() => {
-    if (lat && lon) {
-      setCoordinates({ lat, lon });
+// 선형 보간
+function interpolateUserFeels(targetTemp, userData){
+  if(!userData || userData.length === 0) return null;
+
+  const data = userData
+    .filter(u => u.temperature)
+    .map(u=>({
+      temp: Number(u.temperature.replace('+','')),
+      feel: calcUserFeelScore(u)
+    }))
+    .sort((a,b)=>a.temp-b.temp);
+
+  if(data.length === 0) return null;
+
+  // 선형 보간 또는 범위 밖이면 가장 가까운 값
+  let interpolated = null;
+  for(let i=0;i<data.length-1;i++){
+    const curr = data[i], next = data[i+1];
+    if(targetTemp>=curr.temp && targetTemp<=next.temp){
+      interpolated = curr.feel + ((targetTemp-curr.temp)*(next.feel-curr.feel))/(next.temp-curr.temp);
+      break;
     }
-  }, [lat, lon]);
+  }
+  if(interpolated === null){
+    if(targetTemp < data[0].temp) interpolated = data[0].feel;
+    else interpolated = data[data.length-1].feel;
+  }
 
-  const refreshData = () => {
-    setCoordinates({ lat, lon }); // 기존 좌표 다시 세팅하거나 새로고침 트리거
-    setLastRefreshTime(new Date());
-  };
+  return interpolated;
+}
 
-  // 좌표 바뀔 때 카카오 API로 지역명 가져오기
+// 체감 점수 -> 5단계 레벨 매핑
+function mapFeelScoreToLevel(score){
+  if(score <= -2) return 'socold';
+  if(score > -2 && score <= -0.5) return 'cold';
+  if(score > -0.5 && score <= 0.5) return 'normal';
+  if(score > 0.5 && score <= 2) return 'hot';
+  return 'sohot';
+}
+
+// 옷 추천
+function getClothesRecommendation(feelTemp){
+  if(feelTemp>=28) return '반팔, 반바지, 린넨 셔츠';
+  if(feelTemp>=23) return '반팔, 얇은 셔츠, 슬랙스';
+  if(feelTemp>=20) return '긴팔 셔츠, 가디건, 면바지';
+  if(feelTemp>=17) return '가디건, 얇은 니트, 청바지';
+  if(feelTemp>=12) return '니트, 자켓, 코튼팬츠';
+  if(feelTemp>=6) return '코트, 니트, 기모 바지';
+  return '패딩, 두꺼운 코트, 목도리';
+}
+
+// 오늘 최고/최저
+function getDailyMinMaxTemp(data){
+  let min=null, max=null;
+  data.forEach(i=>{
+    if(i.category==='TMN') min=Number(i.fcstValue);
+    if(i.category==='TMX') max=Number(i.fcstValue);
+  });
+  return {min,max};
+}
+
+// 주소에서 시 이름 추출
+function extractCityName(region){ return region.region_1depth_name; }
+function extractLocalArea(sidoName){ return sidoName; } 
+
+// Firestore에서 유저 문서 전체 가져오기
+async function getAllUserDocs(userId){
+  if(!userId) return [];
+  const q = query(collection(db, "recommendations"), where("uid", "==", userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => doc.data());
+}
+
+// 훅
+export const useWeather = (lat, lon, targetHour, constitution='NHC', condition='normal', userId=null)=>{
+  const [coordinates,setCoordinates] = useState(null);
+  const [locationName,setLocationName] = useState('');
+  const [sidoName,setSidoName] = useState('');
+  const [localArea,setLocalArea] = useState('');
+  const [lastRefreshTime,setLastRefreshTime]=useState(null);
+  const [estimatedFeel, setEstimatedFeel] = useState(null);
+  const [estimatedFeelLevel, setEstimatedFeelLevel] = useState(null);
+  const [recommendInfo, setRecommendInfo] = useState(null);
+
+  // 좌표 세팅
+  useEffect(()=>{if(lat && lon) setCoordinates({lat,lon});},[lat,lon]);
+
+  // 카카오 지도 역지오코딩
   useEffect(() => {
     if (!lat || !lon) return;
-
-    if (!window.kakao || !window.kakao.maps || !window.kakao.maps.services) {
-      setLocationName('서울특별시 중구');
-      return;
-    }
-
+    if (!window.kakao?.maps?.services) return;
     const geocoder = new window.kakao.maps.services.Geocoder();
     geocoder.coord2RegionCode(lon, lat, (result, status) => {
       if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
-        const region = result.find(r => r.region_type === 'H'); // 가장 정확한 구역
+        const region = result.find(r => r.region_type === 'H');
         if (region) {
-          const cityName = extractCityName(region); // 여기에 '서울', '광주', '성남' 등이 나옴
-
-          setSidoName(cityName);
+          setSidoName(extractCityName(region));
           setLocationName(`${region.region_1depth_name} ${region.region_2depth_name}`);
+          setLocalArea(extractLocalArea(region.region_1depth_name));
         }
-      } else {
-        setSidoName('서울');
-        setLocationName('서울특별시 중구');
       }
     });
   }, [lat, lon]);
-  const extractCityName = (region) => {
-    const { region_1depth_name, region_2depth_name } = region;
 
-    // 1depth가 ~특별시, ~광역시, 세종특별자치시면 그대로 사용
-    if (/(특별시|광역시|세종)/.test(region_1depth_name)) {
-      return region_1depth_name.replace(/(특별시|광역시|특별자치시)/, '');
-    }
-
-    // 나머지 (ex: 경기도, 충청남도 등)는 2depth 사용
-    return region_2depth_name.replace(/시$/, ''); // '성남시' → '성남' 등 정리
-  };
-
-  // 좌표 변환 (GRID 좌표)
-  const { base_date, base_time } = getBaseDateTime();
-  const yesterdayDate = getYesterdayDate();
-
-  const { nx, ny } = coordinates
-    ? convertGRID_GPS(coordinates.lat, coordinates.lon)
-    : { nx: null, ny: null };
-
-  // 오늘 단기예보
-  const {
-    data: forecastData,
-    isLoading: forecastLoading,
-    error: forecastError,
-    refetch: refetchForecast,
-    dataUpdatedAt: forecastUpdatedAt,  // react-query가 제공하는 최신 업데이트 시간
-  } = useQuery({
-    queryKey: ['shortTermForecast', nx, ny, base_date, base_time],
-    queryFn: () => getShortTermForecast(nx, ny, base_date, base_time),
-    enabled: !!nx && !!ny,
-    staleTime: 1000 * 60 * 10,
-    refetchInterval: 1000 * 60 * 5,
+  // 단기예보 조회
+  const {base_date,base_time}=getBaseDateTime();
+  const {nx,ny}=coordinates?convertGRID_GPS(coordinates.lat,coordinates.lon):{nx:null,ny:null};
+  const {data: forecastData,isLoading,error,refetch,dataUpdatedAt}=useQuery({
+    queryKey:['shortTermForecast',nx,ny,base_date,base_time],
+    queryFn:()=>getShortTermForecast(nx,ny,base_date,base_time),
+    enabled:!!nx && !!ny,
+    staleTime:1000*60*10,
+    refetchInterval:1000*60*5
   });
 
-  // 어제 단기예보
-  const {
-    data: yesterdayForecastData,
-    isLoading: yesterdayLoading,
-    error: yesterdayError,
-    refetch: refetchYesterday,
-  } = useQuery({
-    queryKey: ['shortTermForecast', nx, ny, yesterdayDate, base_time],
-    queryFn: () => getShortTermForecast(nx, ny, yesterdayDate, base_time),
-    enabled: !!nx && !!ny,
-    staleTime: 1000 * 60 * 60,       // 1시간 캐시
-    refetchInterval: 1000 * 60 * 60, // 1시간마다 재요청
-    retry: 1,                       // 재시도 1회로 줄임
-  });
+  useEffect(()=>{
+    if(!forecastData) return;
 
-  // 대기질 API - 여기서 fetch 직접 호출해서 resultCode 검사하고 에러 처리
-  const {
-    data: airData,
-    isLoading: airLoading,
-    error: airError,
-    refetch: refetchAir,
-  } = useQuery({
-    queryKey: ['airQuality', sidoName],
-    queryFn: async () => {
-      const serviceKey = process.env.REACT_APP_AIRKOREA_API_KEY;
-      const params = new URLSearchParams({
-        serviceKey,
-        returnType: 'json',
-        sidoName,
-        numOfRows: '100',
-        pageNo: '1',
-        ver: '1.0',
+    (async()=>{
+      const now=new Date();
+      const month = now.getMonth()+1;
+      const hour = typeof targetHour==='number' ? targetHour : now.getHours();
+      const forecastHour = Math.floor(hour/3)*3;
+      const forecastTimeStr = `${forecastHour.toString().padStart(2,'0')}00`;
+
+      const filteredItems = forecastData.filter(i=>i.fcstTime===forecastTimeStr);
+      const tempInfo = filteredItems.reduce((acc,cur)=>{ acc[cur.category]=cur.fcstValue; return acc; },{});
+      const {min,max} = getDailyMinMaxTemp(forecastData);
+      const realTemp = Number(tempInfo.TMP);
+      const feelTemp = calcFeelTemp(realTemp, constitution, condition, month, Number(tempInfo.REH), Number(tempInfo.WSD));
+      const recommendation = getClothesRecommendation(feelTemp);
+      const weatherIcon = getWeatherIcon(tempInfo.PTY, tempInfo.SKY);
+
+      // ✅ 유저 데이터 기반 평균 체감 계산
+      let estFeel = null;
+      let estFeelLevel = null;
+      if(userId){
+        const allUserDocs = await getAllUserDocs(userId);
+        const interpolatedFeels = allUserDocs.map(doc=>interpolateUserFeels(realTemp,[doc])).filter(v=>v!==null);
+        if(interpolatedFeels.length > 0){
+          estFeel = interpolatedFeels.reduce((a,b)=>a+b,0)/interpolatedFeels.length; // 평균
+          estFeelLevel = mapFeelScoreToLevel(estFeel);
+          setEstimatedFeel(estFeel);
+          setEstimatedFeelLevel(estFeelLevel);
+        }
+      }
+      setRecommendInfo({
+        ...tempInfo,
+        feelTemp,
+        estimatedFeel: estFeel,
+        estimatedFeelLevel: estFeelLevel,
+        recommendation,
+        weatherIcon,
+        humidityStatus: getHumidityStatus(Number(tempInfo.REH)),
+        windSpeedStatus: getWindSpeedStatus(Number(tempInfo.WSD)),
+        minTemp: min,
+        maxTemp: max
       });
-      const url = `https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?${params.toString()}`;
+    })();
+  },[forecastData, targetHour, constitution, condition, userId]);
 
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`HTTP 에러: ${res.status}`);
-      }
-      const json = await res.json();
+  useEffect(()=>{if(dataUpdatedAt) setLastRefreshTime(new Date(dataUpdatedAt));},[dataUpdatedAt]);
 
-      if (json.response?.header?.resultCode !== '00') {
-        throw new Error(`API 오류: ${json.response.header.resultMsg || '알 수 없음'}`);
-      }
-
-      return json.response.body.items || [];
-    },
-    staleTime: 1000 * 60 * 60,  // 1시간 캐시
-    retry: 1,
-    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
-    onError: (error) => {
-      console.error('대기질 API 에러:', error);
-    },
-  });
-
-  let weatherInfo = null;
-
-  if (forecastData) {
-    const now = new Date();
-    const hour = typeof targetHour === 'number' ? targetHour : now.getHours();
-    const forecastHour = Math.floor(hour / 3) * 3;
-    const forecastTimeStr = `${forecastHour.toString().padStart(2, '0')}00`;
-
-    const filteredItems = forecastData.filter(item => item.fcstTime === forecastTimeStr);
-
-    weatherInfo = filteredItems.reduce((acc, cur) => {
-      acc[cur.category] = cur.fcstValue;
-      return acc;
-    }, {});
-
-    weatherInfo.humidityStatus = getHumidityStatus(Number(weatherInfo.REH));
-    weatherInfo.windSpeedStatus = getWindSpeedStatus(Number(weatherInfo.WSD));
-  }
-
-  if (weatherInfo && airData) {
-    let firstStation = null;
-
-    if (Array.isArray(airData)) {
-      if (airData.length > 0) {
-        firstStation = airData[0];
-      }
-    } else if (typeof airData === 'object' && airData !== null) {
-      firstStation = airData;
-    }
-
-    if (firstStation) {
-      const pm10Raw = firstStation.pm10Value;
-
-      const isValidPm10 =
-        pm10Raw !== null &&
-        pm10Raw !== undefined &&
-        pm10Raw !== '' &&
-        pm10Raw !== '-' &&
-        !isNaN(Number(pm10Raw));
-
-      const pm10 = isValidPm10 ? Number(pm10Raw) : NaN;
-
-      if (!isNaN(pm10)) {
-        weatherInfo.pm10 = pm10;
-        weatherInfo.pm10Grade = pm10Raw;
-        weatherInfo.airQualityStatus = getAirQualityStatus(pm10);
-      } else {
-        weatherInfo.pm10 = null;
-        weatherInfo.pm10Grade = pm10Raw;
-        weatherInfo.airQualityStatus = '정보 없음';
-      }
-    }
-  }
-
-  if (weatherInfo) {
-    const icon = getWeatherIcon(weatherInfo.PTY, weatherInfo.SKY);
-    const description = WEATHER_DESCRIPTION_MAP[icon] || '날씨 정보를 불러올 수 없어요';
-
-    weatherInfo.weatherIcon = icon;
-    weatherInfo.weatherDescription = description;
-    weatherInfo.weatherColor = SKY_ICON_MAP[weatherInfo.SKY] || 'unknown';
-  }
-
-  if (weatherInfo && yesterdayForecastData) {
-    const now = new Date();
-    const hour = typeof targetHour === 'number' ? targetHour : now.getHours();
-    const month = now.getMonth() + 1;
-
-    const todayTemp = extractTMPFromForecast(forecastData, hour);
-    const yesterdayTemp = extractTMPFromForecast(yesterdayForecastData, hour);
-
-    weatherInfo.tempComparisonMsg = getTempComparisonMessage(todayTemp, yesterdayTemp, month);
-  }
-
-  useEffect(() => {
-    if (forecastUpdatedAt) {
-      setLastRefreshTime(new Date(forecastUpdatedAt));
-    }
-  }, [forecastUpdatedAt]);
-
-  return {
-    isLoading: forecastLoading || airLoading,
-    error: forecastError || airError,
-    weatherInfo,
-    locationName,
-    lastRefreshTime,
-    refetch: () => {
-      refetchForecast();
-      refetchAir();
-      refetchYesterday();
-    },
-  };
+  return {isLoading, error, recommendInfo, locationName, sidoName, localArea, lastRefreshTime, refetch, estimatedFeel, estimatedFeelLevel};
 };
