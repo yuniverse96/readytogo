@@ -9,21 +9,24 @@
 #result_closet .recommend_box .weather_box {width: 100%; display: flex; flex-wrap: wrap; align-items: center;}
 #result_closet .recommend_box .weather_box .temp {display: flex; gap: 5px; align-items: center;}
 #result_closet .recommend_box .weather_box .temp p {color: #00242e; font-size: 22px; font-weight: 500;}
+#result_closet .recommend_box .weather_box .icon {max-width: 50px; max-height: 50px; width: 12vw; height: 12vw;}
+#result_closet .recommend_box .weather_box .icon > div,
+#result_closet .recommend_box .weather_box .icon svg  {width: 100% !important; height: 100% !important; }
 #result_closet .recommend_box .weather_box .rh_temp {margin-left: auto;}
 #result_closet .recommend_box .weather_box .rh_temp li {font-size: 12px; color: #00242e; font-weight: 500; display: flex; align-items: center; gap: 5px;}
 #result_closet .recommend_box .weather_box .rh_temp li span{font-size: 8px; line-height: 12px;}
 
-#result_closet .recommend_box .closet_icon {width: 20%; margin: 60px auto; overflow: hidden;}
+#result_closet .recommend_box .closet_icon {width: 23vw; height: 23vw; max-width: 90px; max-height: 90px; margin: -5px auto 7px; overflow: hidden;}
 #result_closet .recommend_box .closet_icon img {width: 100%; height: 100%; object-fit: cover;}
 
 #result_closet .recommend_box .recommend_txt {font-size: 16px; font-weight: 500; line-height: 21px;text-align: center; color: #00242e; word-break: keep-all;}
 #result_closet .recommend_box .recommend_txt b {font-weight: 700;}
-#result_closet .recommend_box .notice {font-size: 12px; margin: 20px 0px 30px; text-align: center; color: #656565;word-break: keep-all;}
+#result_closet .recommend_box .notice {font-size: 12px; margin-top: 14px; padding: 10px; width: 100%; border-radius: 10px; background-color: #f4f4f4; text-align: center; color: #707070;word-break: keep-all;}
 #result_closet .recommend_box .notice b {font-weight: 700;}
 #result_closet .recommend_box .notice .sohot,
-#result_closet .recommend_box .notice .hot {color: rgb(176, 73, 73);} 
+#result_closet .recommend_box .notice .hot {color: #e53333;} 
 #result_closet .recommend_box .notice .socold,
-#result_closet .recommend_box .notice .cold {color: rgb(73, 114, 176);} 
+#result_closet .recommend_box .notice .cold {color: #4972b0;} 
 
 /*아이콘 구름 컬러값 변경.*/
 #cloud {fill: #D9F6FF;}
