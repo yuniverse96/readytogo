@@ -101,11 +101,11 @@ function Login() {
 
             <ul className='find_acc'>
               <li>
-                <Link to="/find-id">아이디 찾기</Link>
+                <Link to="/find/id">아이디 찾기</Link>
               </li>
               <li className='line'></li>
               <li>
-                <Link to="/find-password">비밀번호 찾기</Link>
+                <Link to="/find/password">비밀번호 찾기</Link>
               </li>
             </ul>
           </div>

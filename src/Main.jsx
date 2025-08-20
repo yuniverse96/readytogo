@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import Header from './component/Header';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import FindUser from './pages/FindUser';
 import Welcome from './pages/Welcome';
 import Recommend from './pages/Recommend'; 
 import Spotarea from './pages/Spotarea'; 
@@ -29,6 +30,7 @@ function Main() {
             <Route path="/" element={<Intro />} />
             <Route path='/home/*' element={<Home />}></Route>
             <Route path="/login/*" element={<Login />} /> 
+            <Route path="/find/:mode" element={<FindUser />} />
             <Route path="/welcome" element={<Welcome />} /> 
             <Route path="/recommend" element={<Recommend />} />
             <Route path="/spotarea" element={<Spotarea />} />
