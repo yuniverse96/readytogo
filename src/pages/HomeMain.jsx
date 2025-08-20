@@ -284,9 +284,6 @@ const handleSearchClick = (navigateTarget) => async () => {
                 <p>대기질 {weatherInfo?.airQualityStatus || "보통"}</p>
               </li>
           </ul>
-        {/* <div>강수상태: {weatherInfo?.RN1 || "정보 없음"}</div>
-        <div>하늘상태: {weatherInfo?.SKY || "정보 없음"}</div>
-        <div>icon명: {weatherInfo?.weatherIcon || "정보 없음"}</div> */}
       </section>
       <section className='recommend_wrap'>
       <div 
@@ -306,6 +303,7 @@ const handleSearchClick = (navigateTarget) => async () => {
                 ]);
                 return;
               }
+              navigate("/recommend");
             }}
           >
           <h3>오늘의<br/>체감 기록</h3>
