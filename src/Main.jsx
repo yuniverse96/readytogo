@@ -19,9 +19,8 @@ function Main() {
   useAutoLogout();
 
 
-  const showHeaderPaths = ['/home', '/result_closet', '/login', '/login/join']; // Header 보여줄 경로 목록
-  const shouldShowHeader = showHeaderPaths.includes(location.pathname);
-
+  const showHeaderPaths = ['/home', '/result_closet', '/login']; // Header 보여줄 경로 목록
+  const shouldShowHeader = showHeaderPaths.some(path => location.pathname.startsWith(path));
 
     return (
       <div id="wrap">
@@ -34,7 +33,7 @@ function Main() {
             <Route path="/welcome" element={<Welcome />} /> 
             <Route path="/recommend" element={<Recommend />} />
             <Route path="/spotarea" element={<Spotarea />} />
-            <Route path="/result_closet" element={<ResultCloset />} />
+            <Route path="/result_closet/:mode" element={<ResultCloset />} />
           </Routes>
       </div>
     );

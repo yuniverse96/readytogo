@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import useSearchStore from '../store/useSearchStore';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import useUserId from '../hooks/useUserId';
@@ -9,16 +10,16 @@ import IconWeather from '../component/IconWeather';
 import Loading from '../component/Loading';
 import '../style/resultCloset.css';
 
-
-
 export default function ResultCloset() {
   const [nearestRec, setNearestRec] = useState(null);
   const [shortTermData, setShortTermData] = useState(null);
+  const { mode } = useParams(); // 'recommend' | 'current'
+
   const user = auth.currentUser;
   const navigate = useNavigate();
   const userId = useUserId();
-  // console.log(`오늘과 가장 가까운 기록 문서 ${nearestRec?.date} 기준.`);
-  // 가장 가까운 추천 문서 가져오기
+
+  //가장 가까운 추천 문서 가져오기
   useEffect(() => {
     if (!user) return;
     const fetchNearestRecommendation = async () => {
@@ -56,30 +57,38 @@ export default function ResultCloset() {
     fetchNearestRecommendation();
   }, [user]);
 
-  // meetingTime 없으면 /spotarea로 이동
+  //파라미터 recommend일때 meetingTime 없으면 /spotarea로 이동
   useEffect(() => {
-    if (nearestRec && !nearestRec.meetingTime) {
-      navigate('/spotarea');
+    if (mode === 'recommend') {
+      if (nearestRec && !nearestRec.meetingTime) {
+        navigate('/spotarea');
+      }
     }
-  }, [nearestRec, navigate]);
+  }, [mode, nearestRec, navigate]);
+
+  //currunt일때 정보 가져오기.
+  const { currentPosition } = useSearchStore();
+  const currentLat = currentPosition.lat;
+  const currentLng = currentPosition.lon;
+
+
+  //recommend냐 currunt냐에 따라 정보 제공 수정.
+  const lat = mode === 'recommend' ? nearestRec?.coordinates?.lat : currentLat;
+  const lng = mode === 'recommend' ? nearestRec?.coordinates?.lng : currentLng;
+  const meetingTime = mode === 'recommend'
+  ? nearestRec?.meetingTime
+  : `${String(new Date().getHours()).padStart(2,'0')}${String(new Date().getMinutes()).padStart(2,'0')}`;
+
 
   // useWeather 훅 사용
   const { recommendInfo, locationName, estimatedFeelLevel, isLoading } = useWeather(
-    nearestRec?.coordinates?.lat,
-    nearestRec?.coordinates?.lng,
-    nearestRec?.meetingTime,
+    lat,
+    lng,
+    meetingTime,
     nearestRec?.constitution,
     nearestRec?.condition,
     nearestRec?.uid
   );
-
-  // HHMM → "16:10"
-  const formatMeetingTime = (timeStr) => {
-    if (!timeStr || timeStr.length !== 4) return timeStr;
-    const hour = timeStr.slice(0, 2);
-    const min = timeStr.slice(2, 4);
-    return `${hour}:${min}`;
-  };
 
   const FEEL_LEVEL_TEXT = {
     socold: '매우 추운',
@@ -101,7 +110,9 @@ export default function ResultCloset() {
       <section className="recommend_wrap">
         <div className="title">
           <h2><b>오늘의</b> 추천코디</h2>
-          <p className='area'>{locationName}</p>
+          {mode == 'currunt' && (
+            <p className='area'>{locationName}</p>
+          )}
         </div>
         <div className="recommend_box">
 
@@ -126,7 +137,23 @@ export default function ResultCloset() {
             <img src={`${process.env.PUBLIC_URL}/images/${estimatedFeelLevel}.png`} alt={`${estimatedFeelLevel}`} />
           </div>
           <p className='recommend_txt'>
-              <b>{nearestRec?.meetingTime ? formatTime(nearestRec.meetingTime) : '--'}</b>시 <b>{nearestRec?.meetingPlace}</b>에는 <br/>
+              {mode === 'recommend' && (
+                <>
+                 <b>{nearestRec?.meetingTime ? formatTime(nearestRec.meetingTime) : '--'}</b>시
+                </>
+              )}
+             
+                {mode === 'recommend' && (
+                  <>
+                    <b>{nearestRec?.meetingPlace}</b> 에는
+                  </>
+                )}
+                {mode === 'currunt' && (
+                  <>
+                   <b>{locationName}</b>에 계시는군요
+                  </>
+                )}
+              <br/>
               <b>{recommendInfo.recommendation}</b> 가 적당해요!
           </p>    
           <p className='notice'> 체감온도는 <b>{recommendInfo.feelTemp.toFixed(1)}°C</b> 입니다. <br/>{userId}님에게 <b className={estimatedFeelLevel}>{feelText}</b> 온도에요.</p>
