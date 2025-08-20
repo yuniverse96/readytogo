@@ -38,7 +38,6 @@ function KakaoMapSearch({ onSelectCoordinate }) {
         setSearchResults(data);
       } else {
         setSearchResults([]);
-        alert('장소를 찾을 수 없습니다.');
       }
     });
   };

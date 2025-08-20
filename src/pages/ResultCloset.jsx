@@ -4,15 +4,16 @@ import useSearchStore from '../store/useSearchStore';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import useUserId from '../hooks/useUserId';
-import { convertGRID_GPS, getBaseDateTime, getShortTermForecast } from '../api/WeatherApi';
 import { useWeather } from '../hooks/useWeather';
 import IconWeather from '../component/IconWeather';
+import HourlyWeather from '../component/HourlyWeather';
 import Loading from '../component/Loading';
 import '../style/resultCloset.css';
 
 export default function ResultCloset() {
   const [nearestRec, setNearestRec] = useState(null);
   const [shortTermData, setShortTermData] = useState(null);
+  
   const { mode } = useParams(); // 'recommend' | 'current'
 
   const user = auth.currentUser;
@@ -145,7 +146,7 @@ export default function ResultCloset() {
              
                 {mode === 'recommend' && (
                   <>
-                    <b>{nearestRec?.meetingPlace}</b> 에는
+                    <b>{nearestRec?.meetingPlace}</b>에는
                   </>
                 )}
                 {mode === 'currunt' && (
@@ -158,6 +159,10 @@ export default function ResultCloset() {
           </p>    
           <p className='notice'> 체감온도는 <b>{recommendInfo.feelTemp.toFixed(1)}°C</b> 입니다. <br/>{userId}님에게 <b className={estimatedFeelLevel}>{feelText}</b> 온도에요.</p>
         </div>
+      </section>
+
+      <section className='hourly_data'>
+        <HourlyWeather lat={lat} lng={lng} meetingTime={meetingTime} />
       </section>
     </div>
   );
