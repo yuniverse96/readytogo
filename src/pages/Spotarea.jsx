@@ -157,7 +157,7 @@ function SpotArea() {
         email: user.email,
       });
       showAlert('제출 완료.', [
-        { text: "확인",onClick: () => navigate("/result_closet")}
+        { text: "확인",onClick: () => navigate("/result_closet/recommend")}
       ]);
       setAddress('');
       

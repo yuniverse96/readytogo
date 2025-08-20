@@ -52,13 +52,15 @@ function HomeMain() {
   }, [showFirst]);
 
   // 위치 요청 함수 분리
-// 위치 요청 함수 분리
+  const setCurrentPosition = useSearchStore(state => state.setCurrentPosition);
+
 // 위치 요청 함수 변경
 const fetchCurrentPosition = () => {
   if (!navigator.geolocation) {
     console.warn('이 브라우저는 위치 정보 기능을 지원하지 않음');
     setLat(37.5665);
     setLon(126.9780);
+    setCurrentPosition({ lat: 37.5665, lon: 126.9780 });
     return;
   }
 
@@ -73,6 +75,7 @@ const fetchCurrentPosition = () => {
       // 위치 잡히면 상태 업데이트
       setLat(pos.coords.latitude);
       setLon(pos.coords.longitude);
+      setCurrentPosition({ lat: pos.coords.latitude, lon: pos.coords.longitude });
 
       // 위치가 잡혔으니 watch 종료
       navigator.geolocation.clearWatch(watcherId);
@@ -82,6 +85,7 @@ const fetchCurrentPosition = () => {
       // 5초 안에 못 잡으면 fallback
       setLat(37.5665);
       setLon(126.9780);
+      setCurrentPosition({ lat: 37.5665, lon: 126.9780 });
       // watch 계속 유지 → 이후 위치 잡히면 상태 업데이트 가능
     },
     options
@@ -288,7 +292,7 @@ const handleSearchClick = (navigateTarget) => async () => {
       <section className='recommend_wrap'>
       <div 
           className='recommend_today'  
-          onClick={handleSearchClick('/result_closet')} 
+          onClick={handleSearchClick('/result_closet/currunt')} 
         >
           <h3>오늘의<br/>추천 코디</h3>
           <span className='icon_wrap'></span>
