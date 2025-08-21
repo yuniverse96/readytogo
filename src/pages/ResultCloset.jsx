@@ -145,7 +145,7 @@ export default function ResultCloset() {
              
                 {mode === 'recommend' && (
                   <>
-                    <b>{nearestRec?.meetingPlace}</b>에는
+                    <b> {nearestRec?.meetingPlace}</b>에는
                   </>
                 )}
                 {mode === 'currunt' && (
