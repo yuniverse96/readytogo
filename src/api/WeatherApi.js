@@ -108,3 +108,35 @@ export const getShortTermForecast = async (nx, ny, base_date, base_time) => {
     }
   };
   
+  // 4. 초단기예보 조회 함수 (1시간 간격, 6시간 예보)
+export const getUltraShortTermForecast = async (nx, ny, base_date, base_time) => {
+  const serviceKey = process.env.REACT_APP_KMA_SERVICE_KEY;
+
+  const response = await axios.get(
+    'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst',
+    {
+      params: {
+        serviceKey,
+        pageNo: '1',
+        numOfRows: '1000',
+        dataType: 'JSON',
+        base_date,
+        base_time,
+        nx,
+        ny,
+      },
+    }
+  );
+
+  if (
+    response.data.response &&
+    response.data.response.header.resultCode === '00' &&
+    response.data.response.body
+  ) {
+    return response.data.response.body.items.item;
+  } else {
+    throw new Error(
+      `초단기예보 API 응답 실패: ${response.data.response?.header?.resultMsg || '응답 없음'}`
+    );
+  }
+};
