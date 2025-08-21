@@ -37,7 +37,7 @@
 #result_closet .hourly_data ul li {flex: 1 1 10%; height: 100%; overflow: hidden; color: #fff; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
 #result_closet .hourly_data ul li .time {font-size: 13px; letter-spacing: -0.165px;}
 #result_closet .hourly_data ul li .icon_wrap {width: calc(100% - 16px); aspect-ratio: 1/1;}
-#result_closet .hourly_data ul li .icon_wrap img {width: 100%; height: 100%; object-fit: cover;}
+#result_closet .hourly_data ul li .icon_wrap img {width: 100%; height: auto;}
 #result_closet .hourly_data ul li .temp {font-size: 18px; font-weight: 500; letter-spacing: -0.225px;}
-
+#result_closet .hourly_data + span {display: block; margin-top: 5px; text-align: center; font-size: 11px; color: #666; letter-spacing: -0.225px;}
 

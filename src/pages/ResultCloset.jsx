@@ -12,10 +12,8 @@ import '../style/resultCloset.css';
 
 export default function ResultCloset() {
   const [nearestRec, setNearestRec] = useState(null);
-  const [shortTermData, setShortTermData] = useState(null);
   
   const { mode } = useParams(); // 'recommend' | 'current'
-
   const user = auth.currentUser;
   const navigate = useNavigate();
   const userId = useUserId();
@@ -42,7 +40,6 @@ export default function ResultCloset() {
           const data = doc.data();
           if (data.date) {
             const currentDiff = diff(data.date);
-         
             if (currentDiff < minDiff) {
               minDiff = currentDiff;
               closestDoc = { id: doc.id, ...data };
@@ -67,18 +64,18 @@ export default function ResultCloset() {
     }
   }, [mode, nearestRec, navigate]);
 
-  //currunt일때 정보 가져오기.
+  // currunt일때 정보 가져오기
   const { currentPosition } = useSearchStore();
   const currentLat = currentPosition.lat;
   const currentLng = currentPosition.lon;
 
-
-  //recommend냐 currunt냐에 따라 정보 제공 수정.
+  // recommend냐 currunt냐에 따라 정보 제공 수정
   const lat = mode === 'recommend' ? nearestRec?.coordinates?.lat : currentLat;
   const lng = mode === 'recommend' ? nearestRec?.coordinates?.lng : currentLng;
-  const meetingTime = mode === 'recommend'
-  ? nearestRec?.meetingTime
-  : `${String(new Date().getHours()).padStart(2,'0')}${String(new Date().getMinutes()).padStart(2,'0')}`;
+  const meetingTime =
+    mode === 'recommend'
+      ? nearestRec?.meetingTime
+      : `${String(new Date().getHours()).padStart(2,'0')}${String(new Date().getMinutes()).padStart(2,'0')}`;
 
 
   // useWeather 훅 사용
@@ -100,12 +97,14 @@ export default function ResultCloset() {
   };
   const feelText = FEEL_LEVEL_TEXT[estimatedFeelLevel] || '--';
 
-
   const formatTime = (timeStr) => {
     if (!timeStr || timeStr.length !== 4) return timeStr;
     return `${timeStr.slice(0,2)}:${timeStr.slice(2,4)}`;
   };
-  if (isLoading || !recommendInfo) return <Loading />;
+
+  // 날씨 데이터 준비 안 됐으면 로딩
+  if (isLoading || !recommendInfo || !currentPosition?.lat || !currentPosition?.lon) return <Loading />;
+
   return (
     <div id="result_closet">
       <section className="recommend_wrap">
@@ -117,7 +116,7 @@ export default function ResultCloset() {
         </div>
         <div className="recommend_box">
 
-  {/* 상위 날씨 정보 */}
+          {/* 상위 날씨 정보 */}
           <div className='weather_box'>
             <div className='temp'>
               <div className='icon'>
@@ -133,7 +132,7 @@ export default function ResultCloset() {
             )}
           </div>
           
-  {/* 의류추천 아이콘 */}
+          {/* 의류추천 아이콘 */}
           <div className='closet_icon'>
             <img src={`${process.env.PUBLIC_URL}/images/${estimatedFeelLevel}.png`} alt={`${estimatedFeelLevel}`} />
           </div>
@@ -164,6 +163,7 @@ export default function ResultCloset() {
       <section className='hourly_data'>
         <HourlyWeather lat={lat} lng={lng} meetingTime={meetingTime} />
       </section>
+      <span>※ api 예보 누락으로 인해 정보가 느리게 불러와질수 있습니다. ※</span>
     </div>
   );
 }
