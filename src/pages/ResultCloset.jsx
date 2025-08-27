@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useSearchStore from '../store/useSearchStore';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import useUserId from '../hooks/useUserId';
 import { useWeather } from '../hooks/useWeather';
 import IconWeather from '../component/IconWeather';
 import HourlyWeather from '../component/HourlyWeather';
 import Loading from '../component/Loading';
+import PopAlert,{useAlert} from '../component/PopAlert';
 import '../style/resultCloset.css';
 
 export default function ResultCloset() {
   const [nearestRec, setNearestRec] = useState(null);
+  //커스텀 얼럿.
+  const { showAlert } = useAlert();
   
   const { mode } = useParams(); // 'recommend' | 'current'
   const user = auth.currentUser;
@@ -102,6 +105,39 @@ export default function ResultCloset() {
     return `${timeStr.slice(0,2)}:${timeStr.slice(2,4)}`;
   };
 
+
+  const handleSaveCodi = async () => {
+    if (!user) {
+      alert("로그인 후 이용해주세요!");
+      return;
+    }
+
+    try {
+      const codiData = {
+        uid: user.uid,
+        estimatedFeelLevel,
+        meetingTime,
+        meetingPlace: nearestRec?.meetingPlace || null,
+        locationName,
+        recommendation: recommendInfo.recommendation,
+        feelTemp: recommendInfo.feelTemp.toFixed(1),
+        savedAt: serverTimestamp(),
+      };
+
+      await addDoc(collection(db, "savedCodi"), codiData);
+      showAlert("오늘의 코디가 저장되었습니다!", [
+        { text: "기록보러 가기", onClick: () => navigate("/rcm_list") },
+        { text: "닫기",onClick: () => {}, className:"close"}
+      ]);
+    } catch (error) {
+      console.error("코디 저장 실패:", error);
+      showAlert("저장중 오류가 발생했습니다.", [
+        { text: "확인",onClick: () => {}, className:"close"}
+      ]);
+    }
+  }
+
+
   // 날씨 데이터 준비 안 됐으면 로딩
   if (isLoading || !recommendInfo || !currentPosition?.lat || !currentPosition?.lon) return <Loading />;
 
@@ -145,7 +181,7 @@ export default function ResultCloset() {
              
                 {mode === 'recommend' && (
                   <>
-                    <b>{nearestRec?.meetingPlace}</b>에는
+                    <b> {nearestRec?.meetingPlace}</b>에는
                   </>
                 )}
                 {mode === 'currunt' && (
@@ -164,6 +200,9 @@ export default function ResultCloset() {
         <HourlyWeather lat={lat} lng={lng} meetingTime={meetingTime} />
       </section>
       <span>※ api 예보 누락으로 인해 정보가 느리게 불러와질수 있습니다. ※</span>
+      <section className='save_codi'>
+        <button type='button' onClick={handleSaveCodi}>오늘의 코디 저장</button>
+      </section>
     </div>
   );
 }

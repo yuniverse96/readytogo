@@ -190,11 +190,6 @@ function SpotArea() {
         <div className="btn_wrap prev_btn">
           <button onClick={handleGoBack}>이전</button>
         </div>
-        <div className="btn_wrap go_home">
-          <button type="button" onClick={() => navigate('/home')}>
-            나가기
-          </button>
-        </div>
       </div>
 
       <div className='map_wrap'>

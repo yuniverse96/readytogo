@@ -144,10 +144,11 @@ function Recommend() {
   return (
     <div id="recommend">
       <div className="top_nav">
-        <div className="btn_wrap prev_btn">
-          <button type="button" onClick={() => handleSwiper('prev')}>이전</button>
-        </div>
-
+      {currentSlide > 0 && (
+          <div className="btn_wrap prev_btn">
+            <button type="button" onClick={() => handleSwiper('prev')}>이전</button>
+          </div>
+        )}
         <div className="btn_wrap go_home">
           <button type="button" onClick={() => navigate('/home')}>
             나가기
