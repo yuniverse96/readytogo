@@ -1,7 +1,9 @@
-export default function ListCard({codi}) {
+
+export default function ListCard({codi, onRemove}) {
 
     return(
         <>
+            <button className="remove" type="button" onClick={() => onRemove(codi.id)}>삭제</button>
             <div className="top_info">
                 <span>{codi.date}</span>
                 <p>{codi.meetingPlace}</p>
