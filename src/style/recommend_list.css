@@ -1,0 +1,38 @@
+#recommend_list {width: 100%; padding: 35px 20px 60px; overflow: hidden auto;}
+#recommend_list h2 {font-size: 20px; color: #00242e; font-weight: 500;}
+#recommend_list h2 b {font-weight: 700;}
+
+#recommend_list .card_wrap {width: 100%; margin-top: 15px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px 14px;}
+#recommend_list .card_wrap li {width: 100%; aspect-ratio: 1/1; overflow: hidden; padding: 10px; border-radius: 10px; background-color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05)} 
+#recommend_list .card_wrap .go_recommend {display: flex; flex-direction: column; align-items: center; justify-content: center;}
+#recommend_list .card_wrap .go_recommend p {text-align: center; font-size: 12px; color: #bcbcbc; line-height: 16px;}
+
+#recommend_list .card_wrap .card_box .top_info{ display: flex; flex-direction: column; gap: 2px; justify-content: flex-start; align-items: flex-start;}
+#recommend_list .card_wrap .card_box .top_info span {color: #707070; font-size: 11px; font-weight: 500; letter-spacing: -0.225px;}
+#recommend_list .card_wrap .card_box .top_info p {color: #fff; padding: 1px 8px 2px; border-radius: 40px; font-size: 10px; letter-spacing: -0.225px;}
+
+#recommend_list .card_wrap .card_box .bottom_info {width: 100%; text-align: center;}
+#recommend_list .card_wrap .card_box .bottom_info .img_box{width: 34%; aspect-ratio: 1/1; margin: 10px auto 6px; overflow: hidden;}
+#recommend_list .card_wrap .card_box .bottom_info .img_box > img {width: 100%; height: 100%; object-fit: cover;}
+#recommend_list .card_wrap .card_box .bottom_info .plan {font-size: 12px; font-weight: 700; color: #00242E; margin-bottom: 3px;}
+#recommend_list .card_wrap .card_box .bottom_info .plan .sohot,
+#recommend_list .card_wrap .card_box .bottom_info .plan .hot {color: #FC4148;}
+#recommend_list .card_wrap .card_box .bottom_info .plan .normal {color:#00C00A }
+#recommend_list .card_wrap .card_box .bottom_info .plan .socold,
+#recommend_list .card_wrap .card_box .bottom_info .plan .cold {color: #008EE7;}
+#recommend_list .card_wrap .card_box .bottom_info .recommend {font-size: 10px; color: #00242e; line-height: normal;}
+ 
+/*컬러별 컨트롤*/
+#recommend_list .card_wrap li.red{background-color: #FFE8F1;} 
+#recommend_list .card_wrap li.orange{background-color: #FFECDB;} 
+#recommend_list .card_wrap li.yellow{background-color: #FFFBD8;} 
+#recommend_list .card_wrap li.blue{background-color: #E0F8FF;} 
+#recommend_list .card_wrap li.green{background-color: #E9FFE4;} 
+#recommend_list .card_wrap li.purple{background-color: #EBEDFF;}  
+
+#recommend_list .card_wrap li.red .top_info p{background-color: #FFA1C9;} 
+#recommend_list .card_wrap li.orange .top_info p{background-color: #FFA14E;} 
+#recommend_list .card_wrap li.yellow .top_info p{background-color: #FFA710;} 
+#recommend_list .card_wrap li.blue .top_info p{background-color: #39CDFF;} 
+#recommend_list .card_wrap li.green .top_info p{background-color: #85E871;} 
+#recommend_list .card_wrap li.purple .top_info p{background-color: #9AA1FB;}  

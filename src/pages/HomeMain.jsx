@@ -1,12 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useContext, useEffect, useState,useRef } from 'react';
 import { gsap } from 'gsap';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
-import { collection, query, where, orderBy, limit, getDocs, getFirestore, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, orderBy, limit, getDocs, getFirestore } from "firebase/firestore";
 import { AuthContext } from '../AuthContext';
 import useUserId from '../hooks/useUserId';
-import { useWeather } from '../hooks/useWeather';
 import {useShortWeather} from '../hooks/useShortWeather';
 import AuthInput from '../component/AuthInput';
 import useSearchStore from '../store/useSearchStore';

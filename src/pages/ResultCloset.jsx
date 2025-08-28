@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useSearchStore from '../store/useSearchStore';
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import useUserId from '../hooks/useUserId';
 import { useWeather } from '../hooks/useWeather';
@@ -113,18 +113,28 @@ export default function ResultCloset() {
     }
 
     try {
+      const today = new Date();
+      const dateKey = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+      const timeKey = `${String(today.getHours()).padStart(2, '0')}${String(today.getMinutes()).padStart(2, '0')}`;
+      const customDocId = `${user.uid}_${dateKey}_${timeKey}`;
+  
+      const days = ['일','월','화','수','목','금','토'];
+      const formattedDate = `${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}(${days[today.getDay()]})`;
+
       const codiData = {
         uid: user.uid,
         estimatedFeelLevel,
-        meetingTime,
-        meetingPlace: nearestRec?.meetingPlace || null,
+        meetingTime: formatTime(meetingTime),
+        meetingPlace: mode === 'recommend' ? nearestRec?.meetingPlace : locationName,
+        faceIcon : estimatedFeelLevel,
         locationName,
         recommendation: recommendInfo.recommendation,
         feelTemp: recommendInfo.feelTemp.toFixed(1),
         savedAt: serverTimestamp(),
+        date: formattedDate,
       };
 
-      await addDoc(collection(db, "savedCodi"), codiData);
+      await setDoc(doc(db, "savedCodi", customDocId), codiData);
       showAlert("오늘의 코디가 저장되었습니다!", [
         { text: "기록보러 가기", onClick: () => navigate("/rcm_list") },
         { text: "닫기",onClick: () => {}, className:"close"}
@@ -155,7 +165,7 @@ export default function ResultCloset() {
           {/* 상위 날씨 정보 */}
           <div className='weather_box'>
             <div className='temp'>
-              <div className='icon'>
+              <div className='icon' data-weahter={recommendInfo?.weatherIcon}>
                  <IconWeather type={recommendInfo?.weatherIcon}  />
               </div>
               <p>{recommendInfo.TMP}°C</p>

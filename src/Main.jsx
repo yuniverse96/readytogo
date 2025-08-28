@@ -7,6 +7,7 @@ import Welcome from './pages/Welcome';
 import Recommend from './pages/Recommend'; 
 import Spotarea from './pages/Spotarea'; 
 import ResultCloset from './pages/ResultCloset'; 
+import RecommendList from './pages/RecommedList'; 
 import useAutoLogout from './hooks/useAutoLogout';
 
 import './style/reset.css';
@@ -19,7 +20,7 @@ function Main() {
   useAutoLogout();
 
 
-  const showHeaderPaths = ['/home', '/result_closet', '/login']; // Header 보여줄 경로 목록
+  const showHeaderPaths = ['/home', '/result_closet', '/login', '/rcm_list']; // Header 보여줄 경로 목록
   const shouldShowHeader = showHeaderPaths.some(path => location.pathname.startsWith(path));
 
     return (
@@ -34,6 +35,7 @@ function Main() {
             <Route path="/recommend" element={<Recommend />} />
             <Route path="/spotarea" element={<Spotarea />} />
             <Route path="/result_closet/:mode" element={<ResultCloset />} />
+            <Route path="/rcm_list" element={<RecommendList/>} />
           </Routes>
       </div>
     );
