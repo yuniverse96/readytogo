@@ -82,7 +82,7 @@ const IconWeather = ({ type }) => {
         repeat: -1,
       });
     }
-     else if (type === 'rain' || type === 'rain_overcast' || type === 'rain_cloudy' || type === 'rain_sunny' )  {
+     else if (type === 'rain' || type === 'rain_overcast' || type === 'rain_cloudy' || type === 'rain_sunny' || type === 'shower_overcast' )  {
 
       const cloud = iconRef.current.querySelector('.cloud');
       const drops = iconRef.current.querySelectorAll('.drop'); 
@@ -173,6 +173,7 @@ const IconWeather = ({ type }) => {
       case 'rain_overcast':
       case 'rain_cloudy':
       case 'rain_sunny':
+      case 'shower_overcast':
       return (
         <div ref={iconRef} style={{ display: 'inline-block', position: 'relative' }}>
           <Rainy/>

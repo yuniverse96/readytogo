@@ -73,7 +73,7 @@ function Header() {
                             <li className='my'>
                               <p>내 정보</p>
                             </li>
-                            <li className='before'>
+                            <li className='before' onClick={() => {navigate('/rcm_list'); handleMenuClick();}}>
                               <p>기록 모아보기</p>
                             </li>
                             <li className='messege'>
