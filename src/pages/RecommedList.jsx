@@ -92,7 +92,7 @@ const RecommendList = () => {
         <p>아직 저장된 코디가 없어요.</p>
       ) : (
         <ul className="card_wrap">
-            <li className="go_recommend" onClick={() => navigate('/recommend')}><p>데이터가 많을수록<br/>추천이 정확하게 떠요.</p></li>
+            <li className="go_recommend" onClick={() => navigate('/recommend')}><span className="go_btn"></span> <p>데이터가 많을수록<br/>추천이 정확하게 떠요.</p></li>
             {codiList.map((codi, index) => {
                 const colorClass = shuffledColors[index % shuffledColors.length]; 
                 return (
