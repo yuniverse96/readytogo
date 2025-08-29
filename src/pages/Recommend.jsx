@@ -150,7 +150,7 @@ function Recommend() {
           </div>
         )}
         <div className="btn_wrap go_home">
-          <button type="button" onClick={() => navigate('/home')}>
+          <button type="button" onClick={() => navigate(-1)}>
             나가기
           </button>
         </div>
