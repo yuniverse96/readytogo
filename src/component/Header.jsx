@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import useUserId from '../hooks/useUserId';
 import { AuthContext } from '../AuthContext';
+import PopAlert,{useAlert} from '../component/PopAlert';
 
 
 function Header() {
@@ -11,7 +12,10 @@ function Header() {
     const { user, setUser } = useContext(AuthContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+    //커스텀 얼럿.
+    const { showAlert } = useAlert();
+
+
     const handleButtonClick = async () => {
       setIsMenuOpen(false);
     if (user) {
@@ -32,6 +36,16 @@ function Header() {
         setIsMenuOpen((prev) => !prev); 
     };
 
+    
+
+    function handleDevClick() {
+      showAlert("개발중인 화면입니다.", [
+        { text: "닫기", onClick: () => {}, className: "close" }
+      ]);
+    }
+    
+
+
     return (
       <>
           <div id="header">
@@ -39,7 +53,7 @@ function Header() {
                   <img src={`${process.env.PUBLIC_URL}/images/logo_home.png`} alt="logo" />
               </div>
               <div className='btn_all'>
-                  <button type='button' className='ring'>알림</button>
+                  <button type='button' className='ring' onClick={handleDevClick}>알림</button>
                   <button type='button' className='menu' onClick={handleMenuClick}>메뉴</button>
               </div>
           </div>
@@ -70,18 +84,18 @@ function Header() {
                       <ul>
                         {user && (
                           <>
-                            <li className='my'>
+                            <li className='my' onClick={handleDevClick}>
                               <p>내 정보</p>
                             </li>
                             <li className='before' onClick={() => {navigate('/rcm_list'); handleMenuClick();}}>
                               <p>기록 모아보기</p>
                             </li>
-                            <li className='messege'>
+                            <li className='messege' onClick={handleDevClick}>
                               <p>알림</p>
                             </li>
                           </>
                         )}
-                        <li className='qna'>
+                        <li className='qna' onClick={handleDevClick}>
                           <p>문의하기</p>
                         </li>
                       </ul>
