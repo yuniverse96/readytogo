@@ -27,8 +27,8 @@ function Join() {
 
   
   // 이메일 정규식: 영문자, 숫자, @, . 만 허용
-  const emailRegex = /^[A-Za-z0-9@.]+$/;
-  
+  const emailRegex = /^[^\s]+$/;
+
   // 비밀번호 정규식: 영문, 숫자, 특수문자 포함 가능 (4~12자)
   const passwordRegex = /^[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?\\/-]{4,12}$/;
 
@@ -51,8 +51,9 @@ function Join() {
     }
   
     if (name === 'email') {
-      value = value.replace(/[^A-Za-z0-9@.]/g, '');
-      const isValid = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value);
+      value = value.replace(/[^A-Za-z0-9@.\W]/g, '');
+      const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
       
       if (!isValid && value) {
         errorMsg = '유효한 이메일 형식을 입력하세요.';
@@ -195,7 +196,7 @@ const handleSubmit = async (e) => {
   const { userId, email, password, passwordConfirm } = formData;
 
   const userIdRegex = /^[A-Za-z0-9]{4,12}$/;
-  const emailRegex = /^[A-Za-z0-9@.]+$/;
+  const emailRegex = /^[^\s]+$/;
   const passwordRegex = /^[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?\\/-]{4,12}$/;
 
   const errors = {
@@ -265,8 +266,6 @@ const handleSubmit = async (e) => {
       alert('회원가입 중 오류가 발생했습니다.');
     }
   }
-
-  // 나머지 회원가입 로직...
 };
 
 
