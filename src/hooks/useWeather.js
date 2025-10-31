@@ -39,56 +39,81 @@ function calcUserFeelScore({temperature, constitution, condition, season}){
   return temp;
 }
 
-// 선형 보간
-function interpolateUserFeels(targetTemp, userData){
-  if(!userData || userData.length === 0) return null;
+// 계절 mismatch 보정 맵
+const SEASON_MISMATCH = {
+  winter: {winter:0, spring:-1, summer:-3, autumn:-1.5},
+  spring: {winter:-1, spring:0, summer:-1.5, autumn:-1},
+  summer: {winter:-3, spring:-1.5, summer:0, autumn:-1},
+  autumn: {winter:-1.5, spring:-1, summer:-1, autumn:0}
+};
+
+// 선형보간 + 계절 mismatch + 범위 밖 처리
+function interpolateUserFeels(targetTemp, userData) {
+  if (!userData || userData.length === 0) return null;
+
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const currentSeason = [12,1,2].includes(month) ? 'winter'
+                     : [6,7,8].includes(month) ? 'summer'
+                     : [3,4,5].includes(month) ? 'spring'
+                     : 'autumn';
 
   const data = userData
     .filter(u => u.temperature)
-    .map(u=>({
-      temp: Number(u.temperature.replace('+','')),
-      feel: calcUserFeelScore(u)
-    }))
+    .map(u => {
+      // 사용자가 기록한 상대 체감 점수
+      let feel = calcUserFeelScore(u);
+
+      // 계절 mismatch 보정 (상대값)
+      if (u.season && u.season !== currentSeason) {
+        feel += SEASON_MISMATCH[currentSeason][u.season] || 0;
+      }
+
+      return {
+        temp: Number(u.temperature.replace('+','')),
+        feel,
+        condition: u.condition
+      };
+    })
     .sort((a,b)=>a.temp-b.temp);
 
-  if(data.length === 0) return null;
-
-  // 선형 보간 또는 범위 밖이면 가장 가까운 값
+  // 선형보간
   let interpolated = null;
-  for(let i=0;i<data.length-1;i++){
+  for (let i = 0; i < data.length - 1; i++) {
     const curr = data[i], next = data[i+1];
-    if(targetTemp>=curr.temp && targetTemp<=next.temp){
-      interpolated = curr.feel + ((targetTemp-curr.temp)*(next.feel-curr.feel))/(next.temp-curr.temp);
+    if (targetTemp >= curr.temp && targetTemp <= next.temp) {
+      interpolated = curr.feel + (targetTemp - curr.temp) * (next.feel - curr.feel) / (next.temp - curr.temp);
       break;
     }
   }
-  if(interpolated === null){
-    if(targetTemp < data[0].temp) interpolated = data[0].feel;
-    else interpolated = data[data.length-1].feel;
+
+  // 범위 밖 처리
+  if (interpolated === null) {
+    if (targetTemp < data[0].temp) interpolated = data[0].feel - (data[0].temp - targetTemp);
+    else interpolated = data[data.length-1].feel + (targetTemp - data[data.length-1].temp);
   }
 
   return interpolated;
 }
 
-// 체감 점수 -> 5단계 레벨 매핑
+// 점수 -> 레벨 매핑
 function mapFeelScoreToLevel(score){
-  if(score <= -2) return 'socold';
-  if(score > -2 && score <= -0.5) return 'cold';
-  if(score > -0.5 && score <= 0.5) return 'normal';
-  if(score > 0.5 && score <= 2) return 'hot';
+  if(score <= 5) return 'socold';
+  if(score > 5 && score <= 10) return 'cold';
+  if(score > 10 && score <= 15) return 'normal';
+  if(score > 15 && score <= 18) return 'hot';
   return 'sohot';
 }
 
 // 옷 추천
-function getClothesRecommendation(feelTemp){
-  if(feelTemp>=28) return '반팔, 반바지, 린넨 셔츠';
-  if(feelTemp>=23) return '반팔, 얇은 셔츠, 슬랙스';
-  if(feelTemp>=20) return '긴팔 셔츠, 가디건, 면바지';
-  if(feelTemp>=17) return '가디건, 얇은 니트, 청바지';
-  if(feelTemp>=12) return '니트, 자켓, 코튼팬츠';
-  if(feelTemp>=6) return '코트, 니트, 기모 바지';
-  return '패딩, 두꺼운 코트, 목도리';
+function getClothesRecommendation(score){
+  if(score <= 4) return '패딩, 두꺼운 코트, 목도리';
+  if(score <= 8) return '코트, 니트, 기모 바지';
+  if(score <= 12) return '니트, 자켓, 코튼팬츠';
+  if(score <= 16) return '가디건, 얇은 니트, 청바지';
+  return '반팔, 얇은 셔츠, 슬랙스';
 }
+
 
 // 오늘 최고/최저
 function getDailyMinMaxTemp(data){
@@ -100,11 +125,11 @@ function getDailyMinMaxTemp(data){
   return {min,max};
 }
 
-// 주소에서 시 이름 추출
+// 주소
 function extractCityName(region){ return region.region_1depth_name; }
 function extractLocalArea(sidoName){ return sidoName; } 
 
-// Firestore에서 유저 문서 전체 가져오기
+// Firestore 유저 문서
 async function getAllUserDocs(userId){
   if(!userId) return [];
   const q = query(collection(db, "recommendations"), where("uid", "==", userId));
@@ -123,10 +148,8 @@ export const useWeather = (lat, lon, targetHour, constitution='NHC', condition='
   const [estimatedFeelLevel, setEstimatedFeelLevel] = useState(null);
   const [recommendInfo, setRecommendInfo] = useState(null);
 
-  // 좌표 세팅
   useEffect(()=>{if(lat && lon) setCoordinates({lat,lon});},[lat,lon]);
 
-  // 카카오 지도 역지오코딩
   useEffect(() => {
     if (!lat || !lon) return;
     if (!window.kakao?.maps?.services) return;
@@ -143,7 +166,6 @@ export const useWeather = (lat, lon, targetHour, constitution='NHC', condition='
     });
   }, [lat, lon]);
 
-  // 단기예보 조회
   const {base_date,base_time}=getBaseDateTime();
   const {nx,ny}=coordinates?convertGRID_GPS(coordinates.lat,coordinates.lon):{nx:null,ny:null};
   const {data: forecastData,isLoading,error,refetch,dataUpdatedAt}=useQuery({
@@ -156,35 +178,47 @@ export const useWeather = (lat, lon, targetHour, constitution='NHC', condition='
 
   useEffect(()=>{
     if(!forecastData) return;
-
+  
     (async()=>{
       const now=new Date();
       const month = now.getMonth()+1;
       const hour = typeof targetHour==='number' ? targetHour : now.getHours();
       const forecastHour = Math.floor(hour/3)*3;
       const forecastTimeStr = `${forecastHour.toString().padStart(2,'0')}00`;
-
+  
       const filteredItems = forecastData.filter(i=>i.fcstTime===forecastTimeStr);
       const tempInfo = filteredItems.reduce((acc,cur)=>{ acc[cur.category]=cur.fcstValue; return acc; },{});
       const {min,max} = getDailyMinMaxTemp(forecastData);
       const realTemp = Number(tempInfo.TMP);
       const feelTemp = calcFeelTemp(realTemp, constitution, condition, month, Number(tempInfo.REH), Number(tempInfo.WSD));
-      const recommendation = getClothesRecommendation(feelTemp);
-      const weatherIcon = getWeatherIcon(tempInfo.PTY, tempInfo.SKY);
-
-      // ✅ 유저 데이터 기반 평균 체감 계산
+      
       let estFeel = null;
       let estFeelLevel = null;
+  
       if(userId){
         const allUserDocs = await getAllUserDocs(userId);
-        const interpolatedFeels = allUserDocs.map(doc=>interpolateUserFeels(realTemp,[doc])).filter(v=>v!==null);
+        const interpolatedFeels = allUserDocs
+          .map(doc=>interpolateUserFeels(realTemp,[doc]))
+          .filter(v=>v!==null);
+  
         if(interpolatedFeels.length > 0){
-          estFeel = interpolatedFeels.reduce((a,b)=>a+b,0)/interpolatedFeels.length; // 평균
+          estFeel = interpolatedFeels.reduce((a,b)=>a+b,0)/interpolatedFeels.length;
           estFeelLevel = mapFeelScoreToLevel(estFeel);
+  
           setEstimatedFeel(estFeel);
           setEstimatedFeelLevel(estFeelLevel);
+  
+          console.log('[useWeather] interpolatedFeels:', interpolatedFeels);
+          console.log('[useWeather] averaged score (estFeel):', estFeel);
+          console.log('[useWeather] mapped level:', estFeelLevel);
         }
       }
+  
+      // 최종 체감 온도 결정: estFeel 있으면 그것, 없으면 feelTemp
+      const finalFeelTemp = Math.max(Math.min(estFeel ?? feelTemp, realTemp + 6), realTemp - 6);
+      const recommendation = getClothesRecommendation(finalFeelTemp);
+      const weatherIcon = getWeatherIcon(tempInfo.PTY, tempInfo.SKY);
+  
       setRecommendInfo({
         ...tempInfo,
         feelTemp,
@@ -199,7 +233,7 @@ export const useWeather = (lat, lon, targetHour, constitution='NHC', condition='
       });
     })();
   },[forecastData, targetHour, constitution, condition, userId]);
-
+  
   useEffect(()=>{if(dataUpdatedAt) setLastRefreshTime(new Date(dataUpdatedAt));},[dataUpdatedAt]);
 
   return {isLoading, error, recommendInfo, locationName, sidoName, localArea, lastRefreshTime, refetch, estimatedFeel, estimatedFeelLevel};
